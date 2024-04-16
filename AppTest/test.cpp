@@ -15,12 +15,22 @@ public:
 	void SetUp() override {
 		shell = new TestShell(&mock_ssd);
 	}
-	void TearDown() override{
+	void TearDown() override {
 		delete shell;
 	}
 
+	int getValidCount(string output, string value) {
+		int count = 0;
+		size_t pos = output.find(value);
+		while (pos != string::npos) {
+			count++;
+			pos = output.find(value, pos + value.length());
+		}
+		return count;
+	}
+
 	MockSSD mock_ssd;
-	TestShell *shell;
+	TestShell* shell;
 };
 
 TEST_F(TestShellTestFixture, TestWrite) {
@@ -44,18 +54,25 @@ TEST_F(TestShellTestFixture, TestRead) {
 }
 
 TEST_F(TestShellTestFixture, TESTFullRead) {
+	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
 		.Times(100)
-		.WillRepeatedly(Return("0x01234567"));
+		.WillRepeatedly(Return(testvalue));
 
+	testing::internal::CaptureStdout();
 	shell->fullread();
+	string output = testing::internal::GetCapturedStdout();
+
+	EXPECT_EQ(getValidCount(output, testvalue), 100);
+
 }
 
 TEST_F(TestShellTestFixture, TESTFullWrite) {
-	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), "0x01234567"))
+	string testvalue = "0x01234567";
+	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
 
-	shell->fullwrite("0x01234567");
+	shell->fullwrite(testvalue);
 }
 
 TEST(TestShellTEST, TestExit) {
@@ -96,4 +113,28 @@ TEST_F(SsdDriverTestFixture, DummySsdWrite) {
 
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+
+  // EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
+	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+}
+
+TEST(TestShellTEST, TestHelp) {
+
+	TestShell shell;
+	std::stringstream buffer;
+	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
+
+	shell.help();
+
+	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
+
+	string str = "- write {no} {data} : {no}번 LBA에 {data}를 기록\n";
+	str.append("-- {data} : 16진수 \n");
+
+	str.append("-- ex. write 3 0xAAAABBBB\n");
+	str.append("- read {no} : {no}번 LBA를 읽음\n");
+	str.append("- exit : shell이 종료\n");
+	str.append("- help : 각 명령어의 사용 방법을 출력\n");
+
+	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
