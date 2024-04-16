@@ -50,7 +50,8 @@ TEST(TestSSD, ReadZeroLBA) {
 
 TEST(TestSSD, ReadOneLBA) {
 	std::ofstream outFile("nand.txt");
-	outFile << "0x123456780xABCDEFAB" << std::endl;
+	outFile << "0x12345678" << endl;
+	outFile << "0xABCDEFAB" << endl;
 	outFile.close();
 
 	SSD ssd;

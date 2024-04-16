@@ -9,20 +9,24 @@ class SSD {
 private:
 	string data[105];
 public:
-	void read(int lba) {
+	SSD() {
+		for (int i = 0; i < 100; ++i) {
+			data[i] = "0x00000000";
+		}
+	}
+
+	void loadDataFromFile() {
 		ifstream inFile("nand.txt");
 		string line;
-		getline(inFile, line);
+		int index = 0;
+		while (getline(inFile, line) && line != "") {
+			data[index++] = line;
+		}
 		inFile.close();
+	}
 
-		for (int i = 0, j = 0; i < line.length(); i+=10) {
-			data[j++] = line.substr(i, i + 10);
-		}
-
-		if (line == "") {
-			data[lba] = "0x00000000";
-		}
-
+	void read(int lba) {
+		loadDataFromFile();
 		ofstream outFile("result.txt");
 		outFile << data[lba] << std::endl;
 		outFile.close();
