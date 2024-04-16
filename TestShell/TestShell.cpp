@@ -11,21 +11,26 @@ public:
 
 	}
 
+	string getCommand() {
+		string str;
+		cin >> str;
+		return str;
+	}
+
 	void start() {
 		while (1) {
-			string str;
-			cin >> str;
-			if (str == "fullread") {
+			string command = getCommand();
+			if (command == "fullread") {
 				fullread();
 			}
-			else if (str == "fullwrite") {
+			else if (command == "fullwrite") {
 				fullwrite();
 			}
-			else if (str == "read") {
+			else if (command == "read") {
 
 			}
-			else if (str == "exit") {
-				break;
+			else if (command == "exit") {
+				terminateProcess();
 			}
 		}
 		cout << "TestShell is terminated." << endl;
@@ -47,6 +52,10 @@ public:
 		return ssd->read(LBA);
 	}
 
+	void terminateProcess() {
+		delete this;
+	}
+
 	void fullread() {
 		ssd->read(1);
 	}
@@ -56,5 +65,6 @@ public:
 	}
 
 private:
+	bool isAlive = true;
 	ISSD* ssd;
 };

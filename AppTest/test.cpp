@@ -48,3 +48,17 @@ TEST(TestShellTEST, TESTFullRead) {
 
 	shell.fullread();
 }
+
+TEST(TestShellTEST, TestExit) {
+
+	std::shared_ptr<TestShell> ptr = std::make_shared<TestShell>();
+	std::weak_ptr<TestShell> weak_ptr = ptr;
+
+	// 객체가 살아있는지 확인
+	ASSERT_FALSE(weak_ptr.expired());  // ptr이 가리키는 객체가 살아 있어야 합니다.
+
+	ptr->terminateProcess();
+
+	// 이제 weak_ptr를 통해 객체가 삭제되었는지 확인할 수 있습니다.
+	ASSERT_TRUE(weak_ptr.expired());
+}
