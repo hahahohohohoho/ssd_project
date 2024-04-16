@@ -1,30 +1,12 @@
 #pragma once
 #include "ISSD.h"
+#include "IExitStrategy.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 using namespace std;
-
-class IExitStrategy {
-public:
-	virtual void exitProgram(int status) = 0;
-};
-
-class RealExitStrategy : public IExitStrategy {
-public:
-	void exitProgram(int status) override {
-		std::exit(status);
-	}
-};
-
-class TestExitStrategy : public IExitStrategy {
-public:
-	void exitProgram(int status) override {
-		throw std::runtime_error("Program exit called with status " + std::to_string(status));
-	}
-};
 
 class TestShell {
 public:

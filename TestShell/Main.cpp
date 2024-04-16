@@ -1,4 +1,5 @@
 #include "TestShell.cpp"
+#include "ExitStrategy.cpp"
 
 int main() {
 
