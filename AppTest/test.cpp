@@ -57,3 +57,14 @@ TEST_F(TestShellTestFixture, TESTFullWrite) {
 
 	shell->fullwrite("0x01234567");
 }
+
+TEST(TestShellTEST, TestExit) {
+
+	TestExitStrategy testExit;
+	TestShell shell;
+	shell.setExitStrategy(&testExit);
+
+	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
+	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+}
+
