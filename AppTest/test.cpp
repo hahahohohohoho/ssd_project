@@ -15,7 +15,7 @@ public:
 	void SetUp() override {
 		shell = new TestShell(&mock_ssd);
 	}
-	void TearDown() override{
+	void TearDown() override {
 		delete shell;
 	}
 
@@ -30,7 +30,7 @@ public:
 	}
 
 	MockSSD mock_ssd;
-	TestShell *shell;
+	TestShell* shell;
 };
 
 TEST_F(TestShellTestFixture, TestWrite) {
@@ -73,4 +73,35 @@ TEST_F(TestShellTestFixture, TESTFullWrite) {
 		.Times(100);
 
 	shell->fullwrite(testvalue);
+}
+
+TEST(TestShellTEST, TestExit) {
+
+	TestExitStrategy testExit;
+	TestShell shell;
+	shell.setExitStrategy(&testExit);
+
+	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
+	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+}
+
+TEST(TestShellTEST, TestHelp) {
+
+	TestShell shell;
+	std::stringstream buffer;
+	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
+
+	shell.help();
+
+	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
+
+	string str = "- write {no} {data} : {no}번 LBA에 {data}를 기록\n";
+	str.append("-- {data} : 16진수 \n");
+
+	str.append("-- ex. write 3 0xAAAABBBB\n");
+	str.append("- read {no} : {no}번 LBA를 읽음\n");
+	str.append("- exit : shell이 종료\n");
+	str.append("- help : 각 명령어의 사용 방법을 출력\n");
+
+	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }

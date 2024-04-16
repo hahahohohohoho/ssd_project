@@ -3,6 +3,7 @@
 int main() {
 
 	TestShell shell;
+	shell.setExitStrategy(new RealExitStrategy());
 	shell.start();
 
 
