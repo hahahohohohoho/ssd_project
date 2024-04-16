@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 class TestShell {
 public:
 	TestShell() {
@@ -26,6 +28,7 @@ public:
 				break;
 			}
 		}
+		cout << "TestShell is terminated." << endl;
 	}
 
 	void setSsd(ISSD* _ssd){
