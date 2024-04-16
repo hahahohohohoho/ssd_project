@@ -95,7 +95,12 @@ public:
 	}
 
 	void help() {
-		cout << "asdf";
+		cout << "- write {no} {data} : {no}번 LBA에 {data}를 기록\n"
+			<< "-- {data} : 16진수 \n"
+			<< "-- ex. write 3 0xAAAABBBB\n"
+			<< "- read {no} : {no}번 LBA를 읽음\n"
+			<< "- exit : shell이 종료\n"
+			<< "- help : 각 명령어의 사용 방법을 출력\n";
 	}
 
 private:

@@ -15,12 +15,12 @@ public:
 	void SetUp() override {
 		shell = new TestShell(&mock_ssd);
 	}
-	void TearDown() override{
+	void TearDown() override {
 		delete shell;
 	}
 
 	MockSSD mock_ssd;
-	TestShell *shell;
+	TestShell* shell;
 };
 
 TEST_F(TestShellTestFixture, TestWrite) {
@@ -77,6 +77,15 @@ TEST(TestShellTEST, TestHelp) {
 	shell.help();
 
 	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
-	ASSERT_EQ("asdf", buffer.str());  // buffer에 저장된 문자열 검증
+
+	string str = "- write {no} {data} : {no}번 LBA에 {data}를 기록\n";
+	str.append("-- {data} : 16진수 \n");
+
+	str.append("-- ex. write 3 0xAAAABBBB\n");
+	str.append("- read {no} : {no}번 LBA를 읽음\n");
+	str.append("- exit : shell이 종료\n");
+	str.append("- help : 각 명령어의 사용 방법을 출력\n");
+
+	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
 
