@@ -36,7 +36,11 @@ TEST_F(TestShellTestFixture, TestRead) {
 		.Times(1)
 		.WillOnce(Return(string("0x01234567")));
 
-	EXPECT_EQ(shell->read(0), "0x01234567");
+	testing::internal::CaptureStdout();
+	shell->read(0);
+	string output = testing::internal::GetCapturedStdout();
+
+	EXPECT_EQ(output, "0x01234567\n");
 }
 
 TEST_F(TestShellTestFixture, TESTFullRead) {
