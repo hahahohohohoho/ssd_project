@@ -19,6 +19,16 @@ public:
 		delete shell;
 	}
 
+	int getValidCount(string output, string value) {
+		int count = 0;
+		size_t pos = output.find(value);
+		while (pos != string::npos) {
+			count++;
+			pos = output.find(value, pos + value.length());
+		}
+		return count;
+	}
+
 	MockSSD mock_ssd;
 	TestShell* shell;
 };
@@ -44,18 +54,25 @@ TEST_F(TestShellTestFixture, TestRead) {
 }
 
 TEST_F(TestShellTestFixture, TESTFullRead) {
+	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
 		.Times(100)
-		.WillRepeatedly(Return("0x01234567"));
+		.WillRepeatedly(Return(testvalue));
 
+	testing::internal::CaptureStdout();
 	shell->fullread();
+	string output = testing::internal::GetCapturedStdout();
+
+	EXPECT_EQ(getValidCount(output, testvalue), 100);
+
 }
 
 TEST_F(TestShellTestFixture, TESTFullWrite) {
-	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), "0x01234567"))
+	string testvalue = "0x01234567";
+	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
 
-	shell->fullwrite("0x01234567");
+	shell->fullwrite(testvalue);
 }
 
 TEST(TestShellTEST, TestExit) {
@@ -64,7 +81,40 @@ TEST(TestShellTEST, TestExit) {
 	TestShell shell;
 	shell.setExitStrategy(&testExit);
 
-	// EXPECT_THROW ¸¦ »ç¿ëÇÏ¿© exitProgramÀÌ È£ÃâµÉ ¶§ ¿¹¿Ü°¡ ¹ß»ıÇÏ´ÂÁö È®ÀÎ
+	// EXPECT_THROW ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ exitProgramï¿½ï¿½ È£ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ü°ï¿½ ï¿½ß»ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+}
+
+class SsdDriverTestFixture : public testing::Test {
+public:
+	void SetUp() override {
+		ssdDriver = new SSD_Driver("result_dummy.txt");
+		shell = new TestShell(ssdDriver);
+		testing::internal::CaptureStdout();
+
+	}
+	void TearDown() override {
+		delete ssdDriver;
+		delete shell;
+	}
+
+	SSD_Driver* ssdDriver;
+	TestShell* shell;
+};
+
+TEST_F(SsdDriverTestFixture, DummySsdRead) {
+	shell->read(0x1);
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "0x12345678\n");
+}
+TEST_F(SsdDriverTestFixture, DummySsdWrite) {
+	shell->write(0x1,"0x87654321");
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+
+  // EXPECT_THROW ë¥¼ ì‚¬ìš©í•˜ì—¬ exitProgramì´ í˜¸ì¶œë  ë•Œ ì˜ˆì™¸ê°€ ë°œìƒí•˜ëŠ”ì§€ í™•ì¸
 	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
@@ -76,16 +126,15 @@ TEST(TestShellTEST, TestHelp) {
 
 	shell.help();
 
-	std::cout.rdbuf(prevcoutbuf);  // std::coutÀÇ ¿ø·¡ ¹öÆÛ·Î º¹±¸
+	std::cout.rdbuf(prevcoutbuf);  // std::coutì˜ ì›ë˜ ë²„í¼ë¡œ ë³µêµ¬
 
-	string str = "- write {no} {data} : {no}¹ø LBA¿¡ {data}¸¦ ±â·Ï\n";
-	str.append("-- {data} : 16Áø¼ö \n");
+	string str = "- write {no} {data} : {no}ë²ˆ LBAì— {data}ë¥¼ ê¸°ë¡\n";
+	str.append("-- {data} : 16ì§„ìˆ˜ \n");
 
 	str.append("-- ex. write 3 0xAAAABBBB\n");
-	str.append("- read {no} : {no}¹ø LBA¸¦ ÀĞÀ½\n");
-	str.append("- exit : shellÀÌ Á¾·á\n");
-	str.append("- help : °¢ ¸í·É¾îÀÇ »ç¿ë ¹æ¹ıÀ» Ãâ·Â\n");
+	str.append("- read {no} : {no}ë²ˆ LBAë¥¼ ì½ìŒ\n");
+	str.append("- exit : shellì´ ì¢…ë£Œ\n");
+	str.append("- help : ê° ëª…ë ¹ì–´ì˜ ì‚¬ìš© ë°©ë²•ì„ ì¶œë ¥\n");
 
-	ASSERT_EQ(str, buffer.str());  // buffer¿¡ ÀúÀåµÈ ¹®ÀÚ¿­ °ËÁõ
+	ASSERT_EQ(str, buffer.str());  // bufferì— ì €ì¥ëœ ë¬¸ìì—´ ê²€ì¦
 }
-

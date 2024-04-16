@@ -6,10 +6,16 @@
 #include <fstream>
 #include <string>
 
-#include "../SSD/SSD.cpp"
+#include "../SSD/Application.cpp"
 
 using namespace std;
 using namespace testing;
+
+class MockSSD : public ISSD {
+public:
+	MOCK_METHOD(void, read, (int), (override));
+	MOCK_METHOD(void, write, (int, string), (override));
+};
 
 class FileManager {
 private:
@@ -117,4 +123,45 @@ TEST(TestSSD, ReadOneLBA) {
 	inFile.close();
 
 	EXPECT_THAT("0xABCDEFAB", Eq(line));
+}
+
+TEST(TestSSD, AppInvalidArgument) {
+	MockSSD ssd;
+	Application app(&ssd);
+
+	EXPECT_CALL(ssd, read(_))
+		.Times(0);
+	EXPECT_CALL(ssd, write(_,_))
+		.Times(0);
+
+	char* cmd[10] = { "SSD.exe", "E", "0","0x00000000" };
+	app.run(4, cmd);
+}
+
+TEST(TestSSD, AppLessArgument) {
+	MockSSD ssd;
+	Application app(&ssd);
+
+	EXPECT_CALL(ssd, read(_))
+		.Times(0);
+	EXPECT_CALL(ssd, write(_, _))
+		.Times(0);
+
+	char* cmd[10] = { "SSD.exe", "R" };
+	app.run(2, cmd);
+}
+
+TEST(TestSSD, AppArgumentPassing) {
+	MockSSD ssd;
+	Application app(&ssd);
+
+	EXPECT_CALL(ssd, read(0))
+		.Times(1);
+	EXPECT_CALL(ssd, write(0, "0x00000000"))
+		.Times(1);
+
+	char* cmd1[10] = { "SSD.exe", "R", "0","0x00000000" };
+	app.run(4, cmd1);
+	char* cmd2[10] = { "SSD.exe", "W", "0","0x00000000" };
+	app.run(4, cmd2);
 }
