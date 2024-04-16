@@ -68,3 +68,15 @@ TEST(TestShellTEST, TestExit) {
 	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
+TEST(TestShellTEST, TestHelp) {
+
+	TestShell shell;
+	std::stringstream buffer;
+	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
+
+	shell.help();
+
+	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
+	ASSERT_EQ("asdf", buffer.str());  // buffer에 저장된 문자열 검증
+}
+

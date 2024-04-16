@@ -50,6 +50,9 @@ public:
 			else if (command == "exit") {
 				terminateProcess();
 			}
+			else if (command == "help") {
+				help();
+			}
 		}
 	}
 
@@ -89,6 +92,10 @@ public:
 		for (int lba = 0; lba < 100; lba++) {
 			ssd->write(lba, value);
 		}
+	}
+
+	void help() {
+		cout << "";
 	}
 
 private:
