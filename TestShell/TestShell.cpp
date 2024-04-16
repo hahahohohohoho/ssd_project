@@ -48,13 +48,13 @@ public:
 
 	void fullread() {
 		for (int lba = 0; lba < 100; lba++) {
-			ssd->read(lba);
+			read(lba);
 		}
 	}
 
 	void fullwrite(string value) {
 		for (int lba = 0; lba < 100; lba++) {
-			ssd->write(lba, value);
+			write(lba, value);
 		}
 	}
 

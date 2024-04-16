@@ -19,6 +19,16 @@ public:
 		delete shell;
 	}
 
+	int getValidCount(string output, string value) {
+		int count = 0;
+		size_t pos = output.find(value);
+		while (pos != string::npos) {
+			count++;
+			pos = output.find(value, pos + value.length());
+		}
+		return count;
+	}
+
 	MockSSD mock_ssd;
 	TestShell *shell;
 };
@@ -44,16 +54,23 @@ TEST_F(TestShellTestFixture, TestRead) {
 }
 
 TEST_F(TestShellTestFixture, TESTFullRead) {
+	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
 		.Times(100)
-		.WillRepeatedly(Return("0x01234567"));
+		.WillRepeatedly(Return(testvalue));
 
+	testing::internal::CaptureStdout();
 	shell->fullread();
+	string output = testing::internal::GetCapturedStdout();
+
+	EXPECT_EQ(getValidCount(output, testvalue), 100);
+
 }
 
 TEST_F(TestShellTestFixture, TESTFullWrite) {
-	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), "0x01234567"))
+	string testvalue = "0x01234567";
+	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
 
-	shell->fullwrite("0x01234567");
+	shell->fullwrite(testvalue);
 }
