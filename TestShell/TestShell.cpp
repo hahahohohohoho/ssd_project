@@ -42,16 +42,14 @@ public:
 		ssd->write(LBA, value);
 	}
 
-	string read(int LBA) {
-		return ssd->read(LBA);
+	void read(int LBA) {
+		cout << ssd->read(LBA) << endl;
 	}
 
-	vector<string> fullread() {
-		vector<string> read_arr;
+	void fullread() {
 		for (int lba = 0; lba < 100; lba++) {
-			read_arr.push_back(ssd->read(lba));
+			ssd->read(lba);
 		}
-		return read_arr;
 	}
 
 	void fullwrite(string value) {
