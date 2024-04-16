@@ -31,4 +31,7 @@ public:
 		outFile << data[lba] << std::endl;
 		outFile.close();
 	}
+  
+  void write(int address, std::string data) {
+  }
 };
