@@ -1,5 +1,5 @@
 #pragma once
 class IExitStrategy {
 public:
-	virtual void exitProgram(int status) = 0;
+	virtual void exitProgram() = 0;
 };

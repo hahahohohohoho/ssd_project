@@ -5,14 +5,14 @@
 
 class RealExitStrategy : public IExitStrategy {
 public:
-	void exitProgram(int status) override {
-		std::exit(status);
+	void exitProgram() override {
+		std::exit(0);
 	}
 };
 
 class TestExitStrategy : public IExitStrategy {
 public:
-	void exitProgram(int status) override {
-		throw std::runtime_error("Program exit called with status " + std::to_string(status));
+	void exitProgram() override {
+		throw std::runtime_error("Program exit called");
 	}
 };
