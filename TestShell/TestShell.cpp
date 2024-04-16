@@ -107,7 +107,6 @@ public:
 	}
 
 	void help() {
-
 		std::locale::global(std::locale("en_US.UTF-8"));
 		std::cout.imbue(std::locale());
 
@@ -115,6 +114,8 @@ public:
 			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
 			<< "- read {no} : Read LBA {no} times\n"
+			<< "- fullwrite {value} : 0~99 LBA Write Test\n"
+			<< "- fullread : 0~99 LBA Read Test\n"
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
 	}
