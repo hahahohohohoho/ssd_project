@@ -7,6 +7,14 @@ public:
 
 	}
 
+	void write(int LBA, string value) {
+		ssd->write(LBA, value);
+	}
+
+	string read(int LBA) {
+		return ssd->read(LBA);
+	}
+
 	void fullread() {
 		ssd->read(1);
 	}
