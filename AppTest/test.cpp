@@ -64,7 +64,36 @@ TEST(TestShellTEST, TestExit) {
 	TestShell shell;
 	shell.setExitStrategy(&testExit);
 
-	// EXPECT_THROW ¸¦ »ç¿ëÇÏ¿© exitProgramÀÌ È£ÃâµÉ ¶§ ¿¹¿Ü°¡ ¹ß»ýÇÏ´ÂÁö È®ÀÎ
+	// EXPECT_THROW ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ exitProgramï¿½ï¿½ È£ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ü°ï¿½ ï¿½ß»ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
+class SsdDriverTestFixture : public testing::Test {
+public:
+	void SetUp() override {
+		ssdDriver = new SSD_Driver("result_dummy.txt");
+		shell = new TestShell(ssdDriver);
+		testing::internal::CaptureStdout();
+
+	}
+	void TearDown() override {
+		delete ssdDriver;
+		delete shell;
+	}
+
+	SSD_Driver* ssdDriver;
+	TestShell* shell;
+};
+
+TEST_F(SsdDriverTestFixture, DummySsdRead) {
+	shell->read(0x1);
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "0x12345678\n");
+}
+TEST_F(SsdDriverTestFixture, DummySsdWrite) {
+	shell->write(0x1,"0x87654321");
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+}
