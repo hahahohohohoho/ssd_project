@@ -5,7 +5,13 @@
 #include <string>
 using namespace std;
 
-class SSD {
+class ISSD {
+public:
+	virtual void read(int lba) = 0;
+	virtual void write(int lba, string data) = 0;
+};
+
+class SSD : public ISSD {
 private:
 	string data[105];
 public:
@@ -30,5 +36,9 @@ public:
 		ofstream outFile("result.txt");
 		outFile << data[lba] << std::endl;
 		outFile.close();
+	}
+
+	void write(int lba, string data) {
+
 	}
 };
