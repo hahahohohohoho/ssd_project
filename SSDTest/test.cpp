@@ -164,3 +164,27 @@ TEST(TestSSD, AppArgumentPassing) {
 	char* cmd2[10] = { "SSD.exe", "W", "0","0x00000000" };
 	app.run(4, cmd2);
 }
+
+TEST(TestSSD, FileReadEmpty) {
+	std::ofstream outFile("nand.txt");
+	outFile << "" << endl;
+	outFile.close();
+
+	DataArrayFile file("nand.txt");
+	string buf[1];
+	file.readFileLines(buf, 1);
+	EXPECT_THAT(buf[0], Eq(""));
+}
+
+TEST(TestSSD, FileReadTwoLines) {
+	std::ofstream outFile("nand.txt");
+	outFile << "ABCD" << endl;
+	outFile << "EFGH" << endl;
+	outFile.close();
+
+	DataArrayFile file("nand.txt");
+	string buf[2];
+	file.readFileLines(buf, 2);
+	EXPECT_THAT(buf[0], Eq("ABCD"));
+	EXPECT_THAT(buf[1], Eq("EFGH"));
+}

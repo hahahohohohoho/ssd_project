@@ -5,6 +5,23 @@
 #include <string>
 using namespace std;
 
+class DataArrayFile {
+private:
+	string filePath;
+public:
+	DataArrayFile(string filePath)
+		: filePath(filePath) {
+
+	}
+	void readFileLines(string buf[], int size) {
+		ifstream inFile(filePath);
+		for (int i = 0; i < size; ++i) {
+			getline(inFile, buf[i]);
+		}
+		inFile.close();
+	}
+};
+
 class ISSD {
 public:
 	virtual void read(int lba) = 0;
