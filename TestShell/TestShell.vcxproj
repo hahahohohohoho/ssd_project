@@ -130,6 +130,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="TestShell.cpp" />
   </ItemGroup>
   <ItemGroup>
