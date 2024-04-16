@@ -8,11 +8,15 @@ public:
 	}
 
 	void fullread() {
-		ssd->read(1);
+		for (int lba = 0; lba < 100; lba++) {
+			printf("Read %d : %s \n", lba, ssd->read(lba).c_str());
+		}
 	}
 
 	void fullwrite() {
-		ssd->write(1, "0xAAAAAAAA");
+		for (int lba = 0; lba < 100; lba++) {
+			ssd->write(lba, "0xDEADCODE");
+		}
 	}
 
 private:
