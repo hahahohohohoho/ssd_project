@@ -1,5 +1,10 @@
+#include <string>
 
 class SSD {
-public:
+private:
 
+public:
+	void write(int address, std::string data) {
+
+	}
 };
