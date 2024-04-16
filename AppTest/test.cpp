@@ -10,24 +10,33 @@ public:
 	MOCK_METHOD(void, write, (int, string), (override));
 };
 
-TEST(TestShellTEST, TestWrite) {
+class TestShellTestFixture : public testing::Test {
+public:
+	void SetUp() override {
+		shell = new TestShell(&mock_ssd);
+	}
+	void TearDown() override{
+		delete shell;
+	}
+
 	MockSSD mock_ssd;
-	TestShell shell{ &mock_ssd };
+	TestShell *shell;
+};
+
+TEST_F(TestShellTestFixture, TestWrite) {
 
 	EXPECT_CALL(mock_ssd, write(0, "0xDEADCODE"))
 		.Times(1);
 
-	shell.write(0, "0xDEADCODE");
+	shell->write(0, "0xDEADCODE");
 }
-TEST(TestShellTEST, TestRead) {
-	MockSSD mock_ssd;
-	TestShell shell{ &mock_ssd };
+TEST_F(TestShellTestFixture, TestRead) {
 
 	EXPECT_CALL(mock_ssd, read(0))
 		.Times(1)
 		.WillOnce(Return(string("0x01234567")));
 
-	EXPECT_EQ(shell.read(0), "0x01234567");
+	EXPECT_EQ(shell->read(0), "0x01234567");
 }
 
 TEST(TestShellTEST, TESTFullRead) {
