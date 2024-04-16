@@ -39,12 +39,17 @@ TEST_F(TestShellTestFixture, TestRead) {
 	EXPECT_EQ(shell->read(0), "0x01234567");
 }
 
-TEST(TestShellTEST, TESTFullRead) {
-	MockSSD mock_ssd;
-	TestShell shell{ &mock_ssd };
+TEST_F(TestShellTestFixture, TESTFullRead) {
+	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
+		.Times(100)
+		.WillRepeatedly(Return("0x01234567"));
 
-	EXPECT_CALL(mock_ssd, write(1, "0xAAAAAAAA"))
-		.Times(99);
+	shell->fullread();
+}
 
-	shell.fullread();
+TEST_F(TestShellTestFixture, TESTFullWrite) {
+	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), "0x01234567"))
+		.Times(100);
+
+	shell->fullwrite("0x01234567");
 }

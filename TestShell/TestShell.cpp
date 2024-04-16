@@ -1,7 +1,9 @@
 #pragma once
 #include "ISSD.h"
-#include <iostream>
+
 #include <string>
+#include <vector>
+#include <iostream>
 
 class TestShell {
 public:
@@ -17,7 +19,7 @@ public:
 				fullread();
 			}
 			else if (str == "fullwrite") {
-				fullwrite();
+				fullwrite("0x01234567");
 			}
 			else if (str == "read") {
 
@@ -44,12 +46,18 @@ public:
 		return ssd->read(LBA);
 	}
 
-	void fullread() {
-		ssd->read(1);
+	vector<string> fullread() {
+		vector<string> read_arr;
+		for (int lba = 0; lba < 100; lba++) {
+			read_arr.push_back(ssd->read(lba));
+		}
+		return read_arr;
 	}
 
-	void fullwrite() {
-		ssd->write(1, "0xAAAAAAAA");
+	void fullwrite(string value) {
+		for (int lba = 0; lba < 100; lba++) {
+			ssd->write(lba, value);
+		}
 	}
 
 private:
