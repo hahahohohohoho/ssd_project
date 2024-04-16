@@ -27,6 +27,23 @@ TEST(TestSSD, ReadEmptySpace) {
 	std::ifstream inFile("result.txt");
 	string line;
 	getline(inFile, line);
+	inFile.close();
 
 	EXPECT_THAT("0x00000000", Eq(line));
+}
+
+TEST(TestSSD, ReadZeroLBA) {
+	std::ofstream outFile("nand.txt");
+	outFile << "0x12345678" << std::endl;
+	outFile.close();
+
+	SSD ssd;
+	ssd.read(0);
+
+	std::ifstream inFile("result.txt");
+	string line;
+	getline(inFile, line);
+	inFile.close();
+
+	EXPECT_THAT("0x12345678", Eq(line));
 }
