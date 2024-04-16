@@ -95,7 +95,7 @@ public:
 	}
 
 	void help() {
-		cout << "";
+		cout << "asdf";
 	}
 
 private:
