@@ -47,3 +47,19 @@ TEST(TestSSD, ReadZeroLBA) {
 
 	EXPECT_THAT("0x12345678", Eq(line));
 }
+
+TEST(TestSSD, ReadOneLBA) {
+	std::ofstream outFile("nand.txt");
+	outFile << "0x123456780xABCDEFAB" << std::endl;
+	outFile.close();
+
+	SSD ssd;
+	ssd.read(1);
+
+	std::ifstream inFile("result.txt");
+	string line;
+	getline(inFile, line);
+	inFile.close();
+
+	EXPECT_THAT("0xABCDEFAB", Eq(line));
+}
