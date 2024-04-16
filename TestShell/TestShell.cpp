@@ -65,6 +65,10 @@ public:
 			else if (command == "help") {
 				help();
 			}
+			else {
+				cout << "invalid command" << endl;
+				help();
+			}
 		}
 	}
 
@@ -78,6 +82,7 @@ public:
 
 	string getCommand() {
 		string str;
+		cout << "\nCMD > ";
 		cin >> str;
 		return str;
 	}
