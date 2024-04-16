@@ -1,7 +1,9 @@
 #pragma once
 #include "ISSD.h"
-#include <iostream>
+
 #include <string>
+#include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -24,7 +26,6 @@ public:
 	}
 };
 
-
 class TestShell {
 public:
 	TestShell() {
@@ -33,6 +34,23 @@ public:
 
 	TestShell(ISSD* _ssd) : ssd(_ssd) {
 
+	}
+
+	void start() {
+		while (1) {
+			string command = getCommand();
+			if (command == "fullread") {
+				fullread();
+			}
+			else if (command == "fullwrite") {
+				fullwrite("0x01234567");
+			}
+			else if (command == "read") {
+			}
+			else if (command == "exit") {
+				terminateProcess();
+			}
+		}
 	}
 
 	void setSsd(ISSD* _ssd) {
@@ -49,24 +67,6 @@ public:
 		return str;
 	}
 
-	void start() {
-		while (1) {
-			string command = getCommand();
-			if (command == "fullread") {
-				fullread();
-			}
-			else if (command == "fullwrite") {
-				fullwrite();
-			}
-			else if (command == "read") {
-
-			}
-			else if (command == "exit") {
-				terminateProcess();
-			}
-		}
-		cout << "TestShell is terminated." << endl;
-	}
 	void terminateProcess() {
 		exitStrategy->exitProgram(0);
 	}
@@ -75,16 +75,20 @@ public:
 		ssd->write(LBA, value);
 	}
 
-	string read(int LBA) {
-		return ssd->read(LBA);
+	void read(int LBA) {
+		cout << ssd->read(LBA) << endl;
 	}
 
 	void fullread() {
-		ssd->read(1);
+		for (int lba = 0; lba < 100; lba++) {
+			ssd->read(lba);
+		}
 	}
 
-	void fullwrite() {
-		ssd->write(1, "0xAAAAAAAA");
+	void fullwrite(string value) {
+		for (int lba = 0; lba < 100; lba++) {
+			ssd->write(lba, value);
+		}
 	}
 
 private:

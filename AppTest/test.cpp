@@ -36,17 +36,26 @@ TEST_F(TestShellTestFixture, TestRead) {
 		.Times(1)
 		.WillOnce(Return(string("0x01234567")));
 
-	EXPECT_EQ(shell->read(0), "0x01234567");
+	testing::internal::CaptureStdout();
+	shell->read(0);
+	string output = testing::internal::GetCapturedStdout();
+
+	EXPECT_EQ(output, "0x01234567\n");
 }
 
-TEST(TestShellTEST, TESTFullRead) {
-	MockSSD mock_ssd;
-	TestShell shell{ &mock_ssd };
+TEST_F(TestShellTestFixture, TESTFullRead) {
+	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
+		.Times(100)
+		.WillRepeatedly(Return("0x01234567"));
 
-	EXPECT_CALL(mock_ssd, write(1, "0xAAAAAAAA"))
-		.Times(99);
+	shell->fullread();
+}
 
-	shell.fullread();
+TEST_F(TestShellTestFixture, TESTFullWrite) {
+	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), "0x01234567"))
+		.Times(100);
+
+	shell->fullwrite("0x01234567");
 }
 
 TEST(TestShellTEST, TestExit) {
@@ -58,3 +67,4 @@ TEST(TestShellTEST, TestExit) {
 	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
 	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
+

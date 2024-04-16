@@ -32,3 +32,9 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
 - 1인당 1일 1커밋, 1리뷰 하기
 - Pull request 2명 이상에게 리뷰받기
 - 코드 한 줄에 100자 이상 넘지 않기
+
+# 프로젝트 진행 관련 안내/문의
+- 문서 : https://url.kr/3pioxm
+- 코드 제출은 git url
+- project 기능 관련 : sejin.choi@mincoding.co.kr
+- TDD 관련 문의 : jeonghwan.seo@mincoding.co.kr
