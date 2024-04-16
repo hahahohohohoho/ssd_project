@@ -37,8 +37,9 @@ public:
 		outFile << data[lba] << std::endl;
 		outFile.close();
 	}
-
-	void write(int lba, string data) {
-
-	}
+  
+  void write(int address, std::string data) {
+  }
+  
 };
+
