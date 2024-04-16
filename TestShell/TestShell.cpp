@@ -1,10 +1,39 @@
 #pragma once
 #include "ISSD.h"
+
 #include <string>
 #include <vector>
+#include <iostream>
 
 class TestShell {
 public:
+	TestShell() {
+
+	}
+
+	void start() {
+		while (1) {
+			string str;
+			cin >> str;
+			if (str == "fullread") {
+				fullread();
+			}
+			else if (str == "fullwrite") {
+				fullwrite("0x01234567");
+			}
+			else if (str == "read") {
+
+			}
+			else if (str == "exit") {
+				break;
+			}
+		}
+	}
+
+	void setSsd(ISSD* _ssd){
+		ssd = _ssd;
+	}
+
 	TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
