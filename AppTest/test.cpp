@@ -5,7 +5,7 @@
 
 class MockSSD : public ISSD {
 public:
-	MOCK_METHOD(string, read, (), (override));
+	MOCK_METHOD(string, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
 };
 
@@ -16,5 +16,5 @@ TEST(TestShellTEST, TESTFullRead) {
 	EXPECT_CALL(mock_ssd, write(1, "0xAAAAAAAA"))
 		.Times(99);
 
-	shell.fullwrite();
+	shell.fullread();
 }

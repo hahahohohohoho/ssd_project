@@ -3,18 +3,18 @@
 
 class TestShell {
 public:
-	TestShell(ISSD* _shell) : shell(_shell) {
+	TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
 
 	void fullread() {
-		shell->read();
+		ssd->read(1);
 	}
 
 	void fullwrite() {
-		shell->write(1, "0xAAAAAAAA");
+		ssd->write(1, "0xAAAAAAAA");
 	}
 
 private:
-	ISSD* shell;
+	ISSD* ssd;
 };
