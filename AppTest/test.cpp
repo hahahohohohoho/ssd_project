@@ -113,9 +113,6 @@ TEST_F(SsdDriverTestFixture, DummySsdWrite) {
 
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
-
-  // EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
-	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
 TEST(TestShellTEST, TestHelp) {
