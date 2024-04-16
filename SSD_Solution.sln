@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestShell", "TestShell\Test
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSDTest", "SSDTest\SSDTest.vcxproj", "{6FFCD259-0FC7-4B30-B803-BF25D21A07B1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppTest", "AppTest\AppTest.vcxproj", "{D66C4DA9-7031-4226-92DA-442307747A79}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -46,6 +48,14 @@ Global
 		{6FFCD259-0FC7-4B30-B803-BF25D21A07B1}.Release|x64.Build.0 = Release|x64
 		{6FFCD259-0FC7-4B30-B803-BF25D21A07B1}.Release|x86.ActiveCfg = Release|Win32
 		{6FFCD259-0FC7-4B30-B803-BF25D21A07B1}.Release|x86.Build.0 = Release|Win32
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Debug|x64.ActiveCfg = Debug|x64
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Debug|x64.Build.0 = Debug|x64
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Debug|x86.ActiveCfg = Debug|Win32
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Debug|x86.Build.0 = Debug|Win32
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Release|x64.ActiveCfg = Release|x64
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Release|x64.Build.0 = Release|x64
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Release|x86.ActiveCfg = Release|Win32
+		{D66C4DA9-7031-4226-92DA-442307747A79}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
