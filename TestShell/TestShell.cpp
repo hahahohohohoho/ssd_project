@@ -7,6 +7,14 @@ public:
 
 	}
 
+	void write(int LBA, string value) {
+		ssd->write(LBA, value);
+	}
+
+	string read(int LBA) {
+		return ssd->read(LBA);
+	}
+
 	void fullread() {
 		for (int lba = 0; lba < 100; lba++) {
 			printf("Read %d : %s \n", lba, ssd->read(lba).c_str());
