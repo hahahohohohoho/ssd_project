@@ -1,5 +1,7 @@
 #pragma once
 #include "ISSD.h"
+#include <string>
+#include <vector>
 
 class TestShell {
 public:
@@ -15,15 +17,17 @@ public:
 		return ssd->read(LBA);
 	}
 
-	void fullread() {
+	vector<string> fullread() {
+		vector<string> read_arr;
 		for (int lba = 0; lba < 100; lba++) {
-			printf("Read %d : %s \n", lba, ssd->read(lba).c_str());
+			read_arr.push_back(ssd->read(lba));
 		}
+		return read_arr;
 	}
 
-	void fullwrite() {
+	void fullwrite(string value) {
 		for (int lba = 0; lba < 100; lba++) {
-			ssd->write(lba, "0xDEADCODE");
+			ssd->write(lba, value);
 		}
 	}
 
