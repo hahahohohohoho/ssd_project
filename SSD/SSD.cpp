@@ -13,11 +13,11 @@ public:
 
 class SSD : public ISSD {
 private:
-	string data[105];
+	string mData[105];
 public:
 	SSD() {
 		for (int i = 0; i < 100; ++i) {
-			data[i] = "0x00000000";
+			mData[i] = "0x00000000";
 		}
 	}
 
@@ -26,7 +26,7 @@ public:
 		string line;
 		int index = 0;
 		while (getline(inFile, line) && line != "") {
-			data[index++] = line;
+			mData[index++] = line;
 		}
 		inFile.close();
 	}
@@ -34,12 +34,13 @@ public:
 	void read(int lba) {
 		loadDataFromFile();
 		ofstream outFile("result.txt");
-		outFile << data[lba] << std::endl;
+		outFile << mData[lba] << std::endl;
 		outFile.close();
 	}
   
-  void write(int address, std::string data) {
-  }
+	void write(int address, std::string data) {
+
+	}
   
 };
 
