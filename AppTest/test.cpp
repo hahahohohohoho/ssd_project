@@ -81,7 +81,40 @@ TEST(TestShellTEST, TestExit) {
 	TestShell shell;
 	shell.setExitStrategy(&testExit);
 
-	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
+	// EXPECT_THROW �� ����Ͽ� exitProgram�� ȣ��� �� ���ܰ� �߻��ϴ��� Ȯ��
+	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+}
+
+class SsdDriverTestFixture : public testing::Test {
+public:
+	void SetUp() override {
+		ssdDriver = new SSD_Driver("result_dummy.txt");
+		shell = new TestShell(ssdDriver);
+		testing::internal::CaptureStdout();
+
+	}
+	void TearDown() override {
+		delete ssdDriver;
+		delete shell;
+	}
+
+	SSD_Driver* ssdDriver;
+	TestShell* shell;
+};
+
+TEST_F(SsdDriverTestFixture, DummySsdRead) {
+	shell->read(0x1);
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "0x12345678\n");
+}
+TEST_F(SsdDriverTestFixture, DummySsdWrite) {
+	shell->write(0x1,"0x87654321");
+
+	string output = testing::internal::GetCapturedStdout();
+	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+
+  // EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
 	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
