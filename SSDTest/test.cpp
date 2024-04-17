@@ -7,7 +7,7 @@
 #include <string>
 
 #include "../SSD/Application.cpp"
-#include "../SSD/DataArrayFile.cpp"
+
 
 using namespace std;
 using namespace testing;
@@ -201,4 +201,8 @@ TEST(TestSSD, FileWriteTwoLine) {
 		getline(inFile, line);
 		EXPECT_THAT(line, Eq(buf[i]));
 	}
+	inFile.close();
 }
+
+
+

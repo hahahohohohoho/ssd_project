@@ -1,3 +1,4 @@
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +13,13 @@ public:
 	DataArrayFile(string filePath)
 		: filePath(filePath) {
 
+	}
+
+	bool isCreatedFile() {
+		ifstream inFile(filePath);
+		bool ret = inFile.is_open();
+		inFile.close();
+		return ret;
 	}
 
 	void readFileLines(string buf[], int size) {
