@@ -31,33 +31,15 @@ public:
 		}
 	}
 
-	void loadDataFromFile() {
-		ifstream inFile("nand.txt");
-		string line;
-		int index = 0;
-		while (getline(inFile, line) && line != "") {
-			mData[index++] = line;
-		}
-		inFile.close();
-	}
-
 	void read(int lba) {
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
-		if (mData[lba] == "")
-			mData[lba] = "0x00000000";
 		resultFile.writeFileLines(&mData[lba], 1);
 	}
   
-	void write(int address, string data) {
-		loadDataFromFile();
-
-		mData[address] = data;
-
-		ofstream outFile("nand.txt");
-		for (int i = 0; i < 100; i++) {
-			outFile << mData[i] << "\n";
-		}
-		outFile.close();
+	void write(int lba, string data) {
+		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
+		mData[lba] = data;
+		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
 	}
 };
 
