@@ -147,6 +147,13 @@ TEST_F(TestSSDFixture, ReadOneLBA) {
 	EXPECT_THAT(readResult(), "0xABCDEFAB");
 }
 
+TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
+	SSD ssd;
+
+	EXPECT_THROW(ssd.read(-1), out_of_range);
+	EXPECT_THROW(ssd.read(100), out_of_range);
+}
+
 TEST(TestSSD, AppInvalidArgument) {
 	MockSSD ssd;
 	Application app(&ssd);
@@ -197,6 +204,10 @@ TEST(TestSSD, FileReadEmpty) {
 	string buf[1];
 	file.readFileLines(buf, 1);
 	EXPECT_THAT(buf[0], Eq(""));
+
+	std::ofstream removeFile("text.txt");
+	remove("text.txt");
+	removeFile.close();
 }
 
 TEST(TestSSD, FileReadTwoLines) {
@@ -233,6 +244,5 @@ TEST(TestSSD, FileWriteTwoLine) {
 	remove("text.txt");
 	removeFile.close();
 }
-
 
 
