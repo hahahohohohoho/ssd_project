@@ -1,22 +1,18 @@
 #pragma once
-#include "ISSD.h"
-#include "IExitStrategy.h"
-#include "InvalidInputException.cpp"
-
 #include <string>
 #include <vector>
 #include <iostream>
+
+#include "ISSD.h"
+#include "InvalidInputException.cpp"
+
 
 using namespace std;
 
 class TestShell {
 public:
 
-	TestShell(ISSD* _ssd) : ssd(_ssd) {
-
-	}
-
-	TestShell(ISSD* _ssd, IExitStrategy* _exitStartegy) : ssd(_ssd), exitStrategy(_exitStartegy) {
+	explicit TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
 
@@ -61,6 +57,10 @@ public:
 				cout << e.what() << endl;
 				help();
 			}
+			catch (ExitException e) {
+				cout << e.what() << endl;
+				break;
+			}
 		}
 	}
 
@@ -89,7 +89,7 @@ public:
 	}
 
 	void terminateProcess() {
-		exitStrategy->exitProgram();
+		throw ExitException("Exit Program");
 	}
 
 	void write(int LBA, string value) {
@@ -178,7 +178,6 @@ public:
 
 
 private:
-	IExitStrategy* exitStrategy;
 	ISSD* ssd;
 }
 ;

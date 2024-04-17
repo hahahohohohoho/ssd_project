@@ -18,7 +18,7 @@ public:
 class TestShellTestFixture : public testing::Test {
 public:
 	void SetUp() override {
-		shell = new TestShell(&mock_ssd, &testExit);
+		shell = new TestShell(&mock_ssd);
 
 		cinBackup = std::cin.rdbuf();  // 원래 cin 버퍼 백업
 		std::cin.rdbuf(cinMock.rdbuf()); // cin을 cinMock으로 리다이렉션
@@ -94,7 +94,7 @@ TEST_F(TestShellTestFixture, TESTFullWrite) {
 
 TEST_F(TestShellTestFixture, TestExit) {
 
-	EXPECT_THROW(shell->terminateProcess(), std::runtime_error);
+	EXPECT_THROW(shell->terminateProcess(), ExitException);
 }
 
 TEST_F(TestShellTestFixture, TestHelp) {
