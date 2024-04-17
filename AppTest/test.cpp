@@ -100,6 +100,8 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
 	str.append("- read {no} : Read LBA {no} times\n");
+	str.append("- fullwrite {value} : 0~99 LBA Write Test\n");
+	str.append("- fullread : 0~99 LBA Read Test\n");
 	str.append("- exit : shell exits\n");
 	str.append("- help : Displays how to use each command\n");
 
@@ -133,7 +135,7 @@ TEST_F(SsdDriverTestFixture, DummySsdWrite) {
 	shell->write(0x1, "0x87654321");
 
 	string output = testing::internal::GetCapturedStdout();
-	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+	EXPECT_EQ(output, "SSD.exe W 1 0x87654321\n");
 
 	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
 	//EXPECT_THROW(shell.terminateProcess(), std::runtime_error);

@@ -47,6 +47,11 @@ public:
 			else if (command == "help") {
 				help();
 			}
+			else if (command == "testapp1") {
+				fullwrite("0x01234567");
+				fullread();
+			}
+
 			else {
 				cout << "invalid command" << endl;
 				help();
