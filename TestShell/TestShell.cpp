@@ -76,10 +76,7 @@ public:
 	string getValue() {
 		string input_value;
 		cin >> input_value;
-		if (input_value.size() != 10)
-			throw InvalidInputException("Invalid Value");
-
-		if (input_value.substr(0, 2) != "0x")
+		if (input_value.size() != 10 || input_value.substr(0, 2) != "0x")
 			throw InvalidInputException("Invalid Value");
 
 		for (char ch_value : input_value.substr(2, 10)) {
