@@ -17,11 +17,19 @@ class TestShellTestFixture : public testing::Test {
 public:
 	void SetUp() override {
 		shell = new TestShell(&mock_ssd, &testExit);
+
+		cinBackup = std::cin.rdbuf();  // 원래 cin 버퍼 백업
+		std::cin.rdbuf(cinMock.rdbuf()); // cin을 cinMock으로 리다이렉션
 	}
 	void TearDown() override {
 		delete shell;
-	}
 
+		std::cin.rdbuf(cinBackup); // 원래 cin 버퍼로 복원
+	}
+	void setMockInput(const std::string& input) {
+		cinMock.str(input);
+		cinMock.clear();
+	}
 	int getValidCount(string output, string value) {
 		int count = 0;
 		size_t pos = output.find(value);
@@ -35,6 +43,9 @@ public:
 	MockSSD mock_ssd;
 	TestExitStrategy testExit;
 	TestShell* shell;
+
+	std::streambuf* cinBackup;  // cin의 원래 버퍼를 백업
+	std::istringstream cinMock; // 모의 입력 스트림
 };
 
 TEST_F(TestShellTestFixture, TestWrite) {
@@ -104,6 +115,11 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	str.append("- help : Displays how to use each command\n");
 
 	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
+}
+
+TEST_F(TestShellTestFixture, TestValidLba) {
+
+	EXPECT_EQ(shell->checkLba(100), false);
 }
 
 class SsdDriverTestFixture : public testing::Test {

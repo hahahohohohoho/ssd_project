@@ -61,6 +61,10 @@ public:
 		return str;
 	}
 
+	bool checkLba(int lba) {
+		return true;
+	}
+
 	void terminateProcess() {
 		exitStrategy->exitProgram();
 	}
