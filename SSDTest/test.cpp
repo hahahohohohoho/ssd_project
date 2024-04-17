@@ -167,41 +167,49 @@ TEST(TestSSD, AppArgumentPassing) {
 }
 
 TEST(TestSSD, FileReadEmpty) {
-	std::ofstream outFile("nand.txt");
+	std::ofstream outFile("text.txt");
 	outFile << "" << endl;
 	outFile.close();
 
-	DataArrayFile file("nand.txt");
+	DataArrayFile file("text.txt");
 	string buf[1];
 	file.readFileLines(buf, 1);
 	EXPECT_THAT(buf[0], Eq(""));
 }
 
 TEST(TestSSD, FileReadTwoLines) {
-	std::ofstream outFile("nand.txt");
+	std::ofstream outFile("text.txt");
 	outFile << "ABCD" << endl;
 	outFile << "EFGH" << endl;
 	outFile.close();
 
-	DataArrayFile file("nand.txt");
+	DataArrayFile file("text.txt");
 	string buf[2];
 	file.readFileLines(buf, 2);
 	EXPECT_THAT(buf[0], Eq("ABCD"));
 	EXPECT_THAT(buf[1], Eq("EFGH"));
+
+	std::ofstream removeFile("text.txt");
+	remove("text.txt");
+	removeFile.close();
 }
 
 TEST(TestSSD, FileWriteTwoLine) {
-	DataArrayFile file("nand.txt");
+	DataArrayFile file("text.txt");
 	string buf[2] = { "ABCD", "EFGH" };
 	file.writeFileLines(buf, 2);
 
 	string line;
-	ifstream inFile("nand.txt");
+	ifstream inFile("text.txt");
 	for (int i = 0; i < 2; ++i) {
 		getline(inFile, line);
 		EXPECT_THAT(line, Eq(buf[i]));
 	}
 	inFile.close();
+
+	std::ofstream removeFile("text.txt");
+	remove("text.txt");
+	removeFile.close();
 }
 
 
