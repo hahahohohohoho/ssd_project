@@ -66,13 +66,29 @@ public:
 		else throw InvalidInputException("Invalid Command");
 	}
 
+	bool isNumber(const std::string& str) {
+		for (char c : str) {
+			if (!std::isdigit(c)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	int getLba() {
-		int lba;
-		cin >> lba;
-		if (0 > lba || lba > 99) throw InvalidInputException("Invalid Lba");
+		string str_lba;
+		cin >> str_lba;
+
+		if (!isNumber(str_lba))
+			throw InvalidInputException("Invalid Lba");
+
+		int lba = stoi(str_lba);
+		if (0 > lba || lba > 99)
+			throw InvalidInputException("Invalid Lba");
 
 		return lba;
 	}
+
 	string getValue() {
 		string input_value;
 		cin >> input_value;
