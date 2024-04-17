@@ -188,3 +188,16 @@ TEST(TestSSD, FileReadTwoLines) {
 	EXPECT_THAT(buf[0], Eq("ABCD"));
 	EXPECT_THAT(buf[1], Eq("EFGH"));
 }
+
+TEST(TestSSD, FileWriteTwoLine) {
+	DataArrayFile file("nand.txt");
+	string buf[2] = { "ABCD", "EFGH" };
+	file.writeFileLines(buf, 2);
+
+	string line;
+	ifstream inFile("nand.txt");
+	for (int i = 0; i < 2; ++i) {
+		getline(inFile, line);
+		EXPECT_THAT(line, Eq(buf[i]));
+	}
+}

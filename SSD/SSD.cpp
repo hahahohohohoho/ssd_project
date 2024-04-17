@@ -20,6 +20,14 @@ public:
 		}
 		inFile.close();
 	}
+
+	void writeFileLines(string buf[], int size) {
+		ofstream outFile(filePath);
+		for (int i = 0; i < size; ++i) {
+			outFile << buf[i] << endl;
+		}
+		outFile.close();
+	}
 };
 
 class ISSD {
