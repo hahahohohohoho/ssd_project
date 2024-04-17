@@ -5,46 +5,17 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <fstream>
-
-#include <cstdio>
 
 using namespace std;
 
-class SSD_Driver : public ISSD {
-public:
-	explicit SSD_Driver(string outputName) : outputName(outputName) {
-
-	}
-	string read(int lba) override {
-		string cmd = "SSD.exe R " + to_string(lba);
-		system(cmd.c_str());
-
-		ifstream fp(outputName.c_str());
-		string line;
-		if(fp.is_open())
-			getline(fp, line);
-
-		fp.close();
-
-		return line;
-	}
-	void write(int lba, string value) override {
-		string cmd = "SSD.exe W " + to_string(lba) + " " + value;
-		cout << cmd << endl;
-		system(cmd.c_str());
-	}
-
-	string outputName;
-};
-
 class TestShell {
 public:
-	TestShell() {
+
+	TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
 
-	TestShell(ISSD* _ssd) : ssd(_ssd) {
+	TestShell(ISSD* _ssd, IExitStrategy* _exitStartegy) : ssd(_ssd), exitStrategy(_exitStartegy) {
 
 	}
 
@@ -81,14 +52,6 @@ public:
 				help();
 			}
 		}
-	}
-
-	void setSsd(ISSD* _ssd) {
-		ssd = _ssd;
-	}
-
-	void setExitStrategy(IExitStrategy* strategy) {
-		exitStrategy = strategy;
 	}
 
 	string getCommand() {
@@ -138,6 +101,5 @@ public:
 
 private:
 	IExitStrategy* exitStrategy;
-	bool isAlive = true;
 	ISSD* ssd;
 };

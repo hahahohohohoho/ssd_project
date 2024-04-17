@@ -3,6 +3,8 @@
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
 #include "../TestShell/ExitStrategy.cpp"
+#include "../TestShell/SsdDriver.cpp"
+
 using namespace testing;
 
 class MockSSD : public ISSD {
@@ -14,7 +16,7 @@ public:
 class TestShellTestFixture : public testing::Test {
 public:
 	void SetUp() override {
-		shell = new TestShell(&mock_ssd);
+		shell = new TestShell(&mock_ssd, &testExit);
 	}
 	void TearDown() override {
 		delete shell;
@@ -31,6 +33,7 @@ public:
 	}
 
 	MockSSD mock_ssd;
+	TestExitStrategy testExit;
 	TestShell* shell;
 };
 
@@ -76,14 +79,31 @@ TEST_F(TestShellTestFixture, TESTFullWrite) {
 	shell->fullwrite(testvalue);
 }
 
-TEST(TestShellTEST, TestExit) {
+TEST_F(TestShellTestFixture, TestExit) {
 
-	TestExitStrategy testExit;
-	TestShell shell;
-	shell.setExitStrategy(&testExit);
+	EXPECT_THROW(shell->terminateProcess(), std::runtime_error);
+}
 
-	// EXPECT_THROW �� ����Ͽ� exitProgram�� ȣ��� �� ���ܰ� �߻��ϴ��� Ȯ��
-	EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
+TEST_F(TestShellTestFixture, TestHelp) {
+
+	std::stringstream buffer;
+	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
+
+	shell->help();
+
+	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
+
+	std::locale::global(std::locale("en_US.UTF-8"));
+	std::cout.imbue(std::locale());
+
+	string str = "- write {no} {data} : {data} was recorded in LBA {no}\n";
+	str.append("-- {data} : hexadecimal \n");
+	str.append("-- ex. write 3 0xAAAABBBB\n");
+	str.append("- read {no} : Read LBA {no} times\n");
+	str.append("- exit : shell exits\n");
+	str.append("- help : Displays how to use each command\n");
+
+	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
 
 class SsdDriverTestFixture : public testing::Test {
@@ -119,25 +139,4 @@ TEST_F(SsdDriverTestFixture, DummySsdWrite) {
 	//EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
-TEST(TestShellTEST, TestHelp) {
 
-	TestShell shell;
-	std::stringstream buffer;
-	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
-
-	shell.help();
-
-	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
-
-	std::locale::global(std::locale("en_US.UTF-8"));
-	std::cout.imbue(std::locale());
-
-	string str = "- write {no} {data} : {data} was recorded in LBA {no}\n";
-	str.append("-- {data} : hexadecimal \n");
-	str.append("-- ex. write 3 0xAAAABBBB\n");
-	str.append("- read {no} : Read LBA {no} times\n");
-	str.append("- exit : shell exits\n");
-	str.append("- help : Displays how to use each command\n");
-
-	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
-}

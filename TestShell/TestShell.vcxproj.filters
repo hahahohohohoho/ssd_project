@@ -33,6 +33,9 @@
     <ClCompile Include="ExitStrategy.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="SsdDriver.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ISSD.h">
