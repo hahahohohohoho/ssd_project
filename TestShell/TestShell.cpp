@@ -11,7 +11,6 @@ using namespace std;
 
 class TestShell {
 public:
-
 	explicit TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
@@ -19,39 +18,7 @@ public:
 	void start() {
 		while (1) {
 			try {
-				string command = getCommand();
-				if (command == "fullread") {
-					fullread();
-				}
-				else if (command == "fullwrite") {
-					string value = getValue();
-					fullwrite(value);
-				}
-				else if (command == "read") {
-					int lba = getLba();
-					read(lba);
-				}
-				else if (command == "write") {
-					int lba = getLba();
-					string value = getValue();
-					write(lba, value);
-				}
-				else if (command == "exit") {
-					terminateProcess();
-				}
-				else if (command == "help") {
-					help();
-				}
-				else if (command == "testapp1") {
-					testapp1();
-				}
-				else if (command == "testapp2") {
-					testapp2();
-				}
-				else {
-					cout << "Invalid Command" << endl;
-					help();
-				}
+				processCommand(getCommand());
 			}
 			catch (InvalidInputException e) {
 				cout << e.what() << endl;
@@ -65,11 +32,40 @@ public:
 	}
 
 	string getCommand() {
-		string str;
+		string command;
 		cout << "\nCMD > ";
-		cin >> str;
-		return str;
+		cin >> command;
+		return command;
 	}
+	
+	void processCommand(string command) {
+		if (command == "fullread") {
+			fullread();
+		}
+		else if (command == "fullwrite") {
+			fullwrite(getValue());
+		}
+		else if (command == "read") {
+			read(getLba());
+		}
+		else if (command == "write") {
+			write(getLba(), getValue());
+		}
+		else if (command == "exit") {
+			terminateProcess();
+		}
+		else if (command == "help") {
+			help();
+		}
+		else if (command == "testapp1") {
+			testapp1();
+		}
+		else if (command == "testapp2") {
+			testapp2();
+		}
+		else throw InvalidInputException("Invalid Command");
+	}
+
 	int getLba() {
 		int lba;
 		cin >> lba;
@@ -167,9 +163,6 @@ public:
 	}
 
 	void help() {
-		std::locale::global(std::locale("en_US.UTF-8"));
-		std::cout.imbue(std::locale());
-
 		cout << "- write {no} {data} : {data} was recorded in LBA {no}\n"
 			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
@@ -181,8 +174,6 @@ public:
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
 	}
-
-
 
 private:
 	ISSD* ssd;
