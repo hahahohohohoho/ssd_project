@@ -83,13 +83,10 @@ public:
 		if (input_value.size() != 10)
 			throw InvalidInputException("Invalid Value");
 
-		string prefix = input_value.substr(0, 2);
-		string value = input_value.substr(2, 10);
-
-		if (prefix[0] != '0' || prefix[1] != 'x')
+		if (input_value.substr(0, 2) != "0x")
 			throw InvalidInputException("Invalid Value");
 
-		for (char ch_value : value) {
+		for (char ch_value : input_value.substr(2, 10)) {
 			if ('0' <= ch_value && ch_value <= '9') continue;
 			if ('A' <= ch_value && ch_value <= 'F') continue;
 			throw InvalidInputException("Invalid Value");
