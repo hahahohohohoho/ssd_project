@@ -71,14 +71,21 @@ public:
 		return lba;
 	}
 	string getValue() {
-		string value;
-		cin >> value;
-		for (int i = 0; i < value.size(); i++) {
-			if ('0' <= value[i] && value[i] <= '9') continue;
-			if ('A' <= value[i] && value[i] <= 'F') continue;
+		string input_value;
+		cin >> input_value;
+		if (input_value.size() != 10)
+			throw InvalidInputException("Invalid Value");
+
+		if (input_value.substr(0, 2) != "0x")
+			throw InvalidInputException("Invalid Value");
+
+		for (char ch_value : input_value.substr(2, 10)) {
+			if ('0' <= ch_value && ch_value <= '9') continue;
+			if ('A' <= ch_value && ch_value <= 'F') continue;
 			throw InvalidInputException("Invalid Value");
 		}
-		return value;
+
+		return input_value;
 	}
 
 	void terminateProcess() {

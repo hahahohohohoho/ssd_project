@@ -134,6 +134,11 @@ TEST_F(TestShellTestFixture, TestGetValue) {
 
 	EXPECT_THROW(shell->getValue(), InvalidInputException);
 }
+TEST_F(TestShellTestFixture, TestGetValueNormal) {
+	setMockInput("0xABCDABCD");
+
+	EXPECT_EQ(shell->getValue(), "0xABCDABCD");
+}
 
 class SsdDriverTestFixture : public testing::Test {
 public:
