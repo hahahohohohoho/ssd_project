@@ -43,13 +43,17 @@ public:
 			fullread();
 		}
 		else if (command == "fullwrite") {
-			fullwrite(getValue());
+			getValue();
+			fullwrite(this->value);
 		}
 		else if (command == "read") {
-			read(getLba());
+			getLba();
+			read(this->lba);
 		}
 		else if (command == "write") {
-			write(getLba(), getValue());
+			getLba();
+			getValue();
+			write(this->lba, this->value);
 		}
 		else if (command == "exit") {
 			terminateProcess();
@@ -75,45 +79,40 @@ public:
 		return true;
 	}
 
-	int getLba() {
+	void getLba() {
 		string str_lba;
 		cin >> str_lba;
 
 		if (!isNumber(str_lba))
 			throw InvalidInputException("Invalid Lba");
 
-		int lba = stoi(str_lba);
-		if (0 > lba || lba > 99)
+		this->lba = stoi(str_lba);
+		if (0 > this->lba || this->lba > 99)
 			throw InvalidInputException("Invalid Lba");
-
-		return lba;
 	}
 
-	string getValue() {
-		string input_value;
-		cin >> input_value;
-		if (input_value.size() != 10 || input_value.substr(0, 2) != "0x")
+	void getValue() {
+		cin >> this->value;
+		if (this->value.size() != 10 || this->value.substr(0, 2) != "0x")
 			throw InvalidInputException("Invalid Value");
 
-		for (char ch_value : input_value.substr(2, 10)) {
+		for (char ch_value : this->value.substr(2, 10)) {
 			if ('0' <= ch_value && ch_value <= '9') continue;
 			if ('A' <= ch_value && ch_value <= 'F') continue;
 			throw InvalidInputException("Invalid Value");
 		}
-
-		return input_value;
 	}
 
 	void terminateProcess() {
 		throw ExitException("Exit Program");
 	}
 
-	void write(int LBA, string value) {
-		ssd->write(LBA, value);
+	void write(int lba, string value) {
+		ssd->write(lba, value);
 	}
 
-	string read(int LBA) {
-		string value = ssd->read(LBA);
+	string read(int lba) {
+		string value = ssd->read(lba);
 		cout << value << endl;
 
 		return value;
@@ -190,5 +189,7 @@ public:
 
 private:
 	ISSD* ssd;
+	int lba;
+	string value;
 }
 ;
