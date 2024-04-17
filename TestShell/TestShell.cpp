@@ -1,6 +1,7 @@
 #pragma once
 #include "ISSD.h"
 #include "IExitStrategy.h"
+#include "InvalidInputException.cpp"
 
 #include <string>
 #include <vector>
@@ -21,40 +22,43 @@ public:
 
 	void start() {
 		while (1) {
-			string command = getCommand();
-			if (command == "fullread") {
-				fullread();
+			try {
+				string command = getCommand();
+				if (command == "fullread") {
+					fullread();
+				}
+				else if (command == "fullwrite") {
+					string value = getValue();
+					fullwrite(value);
+				}
+				else if (command == "read") {
+					int lba = getLba();
+					read(lba);
+				}
+				else if (command == "write") {
+					int lba = getLba();
+					string value = getValue();
+					write(lba, value);
+				}
+				else if (command == "exit") {
+					terminateProcess();
+				}
+				else if (command == "help") {
+					help();
+				}
+				else if (command == "testapp1") {
+					testapp1();
+				}
+				else if (command == "testapp2") {
+					testapp2();
+				}
+				else {
+					cout << "Invalid Command" << endl;
+					help();
+				}
 			}
-			else if (command == "fullwrite") {
-				string value;
-				cin >> value;
-				fullwrite(value);
-			}
-			else if (command == "read") {
-				int lba;
-				cin >> lba;
-				read(lba);
-			}
-			else if (command == "write") {
-				int lba;
-				string value;
-				cin >> lba >> value;
-				write(lba, value);
-			}
-			else if (command == "exit") {
-				terminateProcess();
-			}
-			else if (command == "help") {
-				help();
-			}
-			else if (command == "testapp1") {
-				testapp1();
-			}
-			else if (command == "testapp2") {
-				testapp2();
-			}
-			else {
-				cout << "invalid command" << endl;
+			catch (InvalidInputException e) {
+				cout << e.what() << endl;
 				help();
 			}
 		}
@@ -65,6 +69,23 @@ public:
 		cout << "\nCMD > ";
 		cin >> str;
 		return str;
+	}
+	int getLba() {
+		int lba;
+		cin >> lba;
+		if (0 > lba || lba > 99) throw InvalidInputException("Invalid Lba");
+
+		return lba;
+	}
+	string getValue() {
+		string value;
+		cin >> value;
+		for (int i = 0; i < value.size(); i++) {
+			if ('0' <= value[i] && value[i] <= '9') continue;
+			if ('A' <= value[i] && value[i] <= 'F') continue;
+			throw InvalidInputException("Invalid Value");
+		}
+		return value;
 	}
 
 	void terminateProcess() {
@@ -159,4 +180,5 @@ public:
 private:
 	IExitStrategy* exitStrategy;
 	ISSD* ssd;
-};
+}
+;
