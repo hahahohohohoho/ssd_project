@@ -1,19 +1,13 @@
 #pragma once
 #include "ISSD.h"
 #include "IExitStrategy.h"
+#include "InvalidInputException.cpp"
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 using namespace std;
-
-class InvalidInputException : public exception {
-public:
-	explicit InvalidInputException(char const* message) : exception(message) {
-
-	}
-};
 
 class TestShell {
 public:
@@ -83,7 +77,7 @@ public:
 		for (int i = 0; i < value.size(); i++) {
 			if ('0' <= value[i] && value[i] <= '9') continue;
 			if ('A' <= value[i] && value[i] <= 'F') continue;
-			throw InvalidInputException("Invalid Lba");
+			throw InvalidInputException("Invalid Value");
 		}
 		return value;
 	}

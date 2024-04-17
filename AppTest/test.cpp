@@ -130,19 +130,6 @@ TEST_F(TestShellTestFixture, TestGetValue) {
 	EXPECT_THROW(shell->getValue(), InvalidInputException);
 }
 
-//TEST_F(TestShellTestFixture, TestValidLba) {
-//
-//	EXPECT_EQ(shell->checkLba(100), false);
-//	EXPECT_EQ(shell->checkLba(50), true);
-//}
-//
-//TEST_F(TestShellTestFixture, TestValidValue) {
-//
-//	EXPECT_EQ(shell->checkValue("qwe"), false);
-//	EXPECT_EQ(shell->checkValue("50"), true);
-//	EXPECT_EQ(shell->checkValue("ABC"), true);
-//}
-
 class SsdDriverTestFixture : public testing::Test {
 public:
 	void SetUp() override {
