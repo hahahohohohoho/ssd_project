@@ -40,11 +40,12 @@ public:
 
 class TestShell {
 public:
-	TestShell() {
+
+	TestShell(ISSD* _ssd) : ssd(_ssd) {
 
 	}
 
-	TestShell(ISSD* _ssd) : ssd(_ssd) {
+	TestShell(ISSD* _ssd, IExitStrategy* _exitStartegy) : ssd(_ssd), exitStrategy(_exitStartegy) {
 
 	}
 
@@ -66,14 +67,6 @@ public:
 				help();
 			}
 		}
-	}
-
-	void setSsd(ISSD* _ssd) {
-		ssd = _ssd;
-	}
-
-	void setExitStrategy(IExitStrategy* strategy) {
-		exitStrategy = strategy;
 	}
 
 	string getCommand() {
