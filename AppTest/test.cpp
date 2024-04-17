@@ -3,6 +3,8 @@
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
 #include "../TestShell/ExitStrategy.cpp"
+#include "../TestShell/SsdDriver.cpp"
+
 using namespace testing;
 
 class MockSSD : public ISSD {

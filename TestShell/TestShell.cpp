@@ -5,38 +5,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <fstream>
-
-#include <cstdio>
 
 using namespace std;
-
-class SSD_Driver : public ISSD {
-public:
-	explicit SSD_Driver(string outputName) : outputName(outputName) {
-
-	}
-	string read(int lba) override {
-		string cmd = "ssd.exe read " + to_string(lba);
-		system(cmd.c_str());
-
-		ifstream fp(outputName.c_str());
-		string line;
-		if(fp.is_open())
-			getline(fp, line);
-
-		fp.close();
-
-		return line;
-	}
-	void write(int lba, string value) override {
-		string cmd = "ssd.exe write " + to_string(lba) + " " + value;
-		cout << cmd << endl;
-		system(cmd.c_str());
-	}
-
-	string outputName;
-};
 
 class TestShell {
 public:
@@ -114,6 +84,5 @@ public:
 
 private:
 	IExitStrategy* exitStrategy;
-	bool isAlive = true;
 	ISSD* ssd;
 };
