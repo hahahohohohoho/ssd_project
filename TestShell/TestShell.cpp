@@ -26,9 +26,20 @@ public:
 				fullread();
 			}
 			else if (command == "fullwrite") {
-				fullwrite("0x01234567");
+				string value;
+				cin >> value;
+				fullwrite(value);
 			}
 			else if (command == "read") {
+				int lba;
+				cin >> lba;
+				read(lba);
+			}
+			else if (command == "write") {
+				int lba;
+				string value;
+				cin >> lba >> value;
+				write(lba, value);
 			}
 			else if (command == "exit") {
 				terminateProcess();
@@ -36,11 +47,16 @@ public:
 			else if (command == "help") {
 				help();
 			}
+			else {
+				cout << "invalid command" << endl;
+				help();
+			}
 		}
 	}
 
 	string getCommand() {
 		string str;
+		cout << "\nCMD > ";
 		cin >> str;
 		return str;
 	}
@@ -70,7 +86,6 @@ public:
 	}
 
 	void help() {
-
 		std::locale::global(std::locale("en_US.UTF-8"));
 		std::cout.imbue(std::locale());
 
@@ -78,6 +93,8 @@ public:
 			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
 			<< "- read {no} : Read LBA {no} times\n"
+			<< "- fullwrite {value} : 0~99 LBA Write Test\n"
+			<< "- fullread : 0~99 LBA Read Test\n"
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
 	}
