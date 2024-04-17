@@ -3,9 +3,8 @@
 
 int main() {
 
-	TestShell shell;
+	TestShell shell(new SSD_Driver("result.txt"));
 	shell.setExitStrategy(new RealExitStrategy());
-	shell.setSsd(new SSD_Driver("result_dummy.txt"));
 	shell.start();
 
 
