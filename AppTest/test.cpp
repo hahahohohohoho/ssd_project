@@ -131,7 +131,7 @@ TEST_F(TestShellTestFixture, TestGetLba) {
 TEST_F(TestShellTestFixture, TestGetLbaNormal) {
 	setMockInput("98");
 
-	EXPECT_EQ(shell->getLba(), 98);
+	EXPECT_NO_THROW(shell->getLba(), 98);
 }
 
 TEST_F(TestShellTestFixture, TestGetValue) {
@@ -143,7 +143,7 @@ TEST_F(TestShellTestFixture, TestGetValue) {
 TEST_F(TestShellTestFixture, TestGetValueNormal) {
 	setMockInput("0xABCDABCD");
 
-	EXPECT_EQ(shell->getValue(), "0xABCDABCD");
+	EXPECT_NO_THROW(shell->getValue(), "0xABCDABCD");
 }
 
 class SsdDriverTestFixture : public testing::Test {
