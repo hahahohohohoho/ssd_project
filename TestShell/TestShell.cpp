@@ -62,6 +62,17 @@ public:
 	}
 
 	bool checkLba(int lba) {
+		if (0 <= lba && lba <= 99)
+			return true;
+		return false;
+	}
+
+	bool checkValue(string value) {
+		for (int i = 0; i < value.size(); i++) {
+			if ('0' <= value[i] && value[i] <= '9') continue;
+			if ('A' <= value[i] && value[i] <= 'F') continue;
+			return false;
+		}
 		return true;
 	}
 
@@ -97,7 +108,7 @@ public:
 			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
 			<< "- read {no} : Read LBA {no} times\n"
-			<< "- fullwrite {value} : 0~99 LBA Write Test\n"
+			<< "- fullwrite { value } : 0~99 LBA Write Test\n"
 			<< "- fullread : 0~99 LBA Read Test\n"
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
