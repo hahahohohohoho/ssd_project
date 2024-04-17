@@ -5,6 +5,8 @@
 #include "../TestShell/ExitStrategy.cpp"
 #include "../TestShell/SsdDriver.cpp"
 
+#include <fstream>
+
 using namespace testing;
 
 class MockSSD : public ISSD {
@@ -100,8 +102,10 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
 	str.append("- read {no} : Read LBA {no} times\n");
-	str.append("- fullwrite {value} : 0~99 LBA Write Test\n");
-	str.append("- fullread : 0~99 LBA Read Test\n");
+	str.append("- fullwrite {value} : 0~99 LBA Write\n");
+	str.append("- fullread : 0~99 LBA Read\n");
+	str.append("- testapp1 : fullread/write test\n");
+	str.append("- testapp2 : Write Aging Test\n");
 	str.append("- exit : shell exits\n");
 	str.append("- help : Displays how to use each command\n");
 
@@ -111,7 +115,9 @@ TEST_F(TestShellTestFixture, TestHelp) {
 class SsdDriverTestFixture : public testing::Test {
 public:
 	void SetUp() override {
-		ssdDriver = new SSD_Driver("result_dummy.txt");
+		string dummy_file = "result_dummy.txt";
+		createDummy(dummy_file);
+		ssdDriver = new SSD_Driver(dummy_file);
 		shell = new TestShell(ssdDriver);
 		testing::internal::CaptureStdout();
 
@@ -119,6 +125,16 @@ public:
 	void TearDown() override {
 		delete ssdDriver;
 		delete shell;
+	}
+
+	void createDummy(string filename) {
+		std::ofstream outfile(filename);
+		if (!outfile.is_open()) {
+			std::cerr << "[error] file open failed." << std::endl;
+			return;
+		}
+		outfile << "0x12345678" << std::endl;
+		outfile.close();
 	}
 
 	SSD_Driver* ssdDriver;
