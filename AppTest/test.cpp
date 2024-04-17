@@ -100,8 +100,10 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
 	str.append("- read {no} : Read LBA {no} times\n");
-	str.append("- fullwrite {value} : 0~99 LBA Write Test\n");
-	str.append("- fullread : 0~99 LBA Read Test\n");
+	str.append("- fullwrite {value} : 0~99 LBA Write\n");
+	str.append("- fullread : 0~99 LBA Read\n");
+	str.append("- testapp1 : fullread/write test\n");
+	str.append("- testapp2 : Write Aging Test\n");
 	str.append("- exit : shell exits\n");
 	str.append("- help : Displays how to use each command\n");
 

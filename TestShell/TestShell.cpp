@@ -41,9 +41,6 @@ public:
 				cin >> lba >> value;
 				write(lba, value);
 			}
-			else if (command == "waging") {
-				writeAging();
-			}
 			else if (command == "exit") {
 				terminateProcess();
 			}
@@ -53,7 +50,9 @@ public:
 			else if (command == "testapp1") {
 				testapp1();
 			}
-
+			else if (command == "testapp2") {
+				testapp2();
+			}
 			else {
 				cout << "invalid command" << endl;
 				help();
@@ -111,22 +110,7 @@ public:
 		return true;
 	}
 
-	void help() {
-		std::locale::global(std::locale("en_US.UTF-8"));
-		std::cout.imbue(std::locale());
-
-		cout << "- write {no} {data} : {data} was recorded in LBA {no}\n"
-			<< "-- {data} : hexadecimal \n"
-			<< "-- ex. write 3 0xAAAABBBB\n"
-			<< "- read {no} : Read LBA {no} times\n"
-			<< "- fullwrite {value} : 0~99 LBA Write\n"
-			<< "- fullread : 0~99 LBA Read\n"
-			<< "- waging : Write Aging Test\n"
-			<< "- exit : shell exits\n"
-			<< "- help : Displays how to use each command\n";
-	}
-
-	void writeAging() {
+	void testapp2() {
 		cout << "[TestApp2] Write Aging Test" << endl;
 
 		cout << "\nStep1 > write lba(0~5) value(0xAAAABBBB)" << endl;
@@ -153,6 +137,24 @@ public:
 		}
 		cout << "\n[DONE] TEST SUCCESS!" << endl;
 	}
+
+	void help() {
+		std::locale::global(std::locale("en_US.UTF-8"));
+		std::cout.imbue(std::locale());
+
+		cout << "- write {no} {data} : {data} was recorded in LBA {no}\n"
+			<< "-- {data} : hexadecimal \n"
+			<< "-- ex. write 3 0xAAAABBBB\n"
+			<< "- read {no} : Read LBA {no} times\n"
+			<< "- fullwrite {value} : 0~99 LBA Write\n"
+			<< "- fullread : 0~99 LBA Read\n"
+			<< "- testapp1 : fullread/write test\n"
+			<< "- testapp2 : Write Aging Test\n"
+			<< "- exit : shell exits\n"
+			<< "- help : Displays how to use each command\n";
+	}
+
+
 
 private:
 	IExitStrategy* exitStrategy;
