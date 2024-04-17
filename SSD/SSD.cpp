@@ -63,4 +63,3 @@ public:
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
 	}
 };
-

@@ -184,6 +184,8 @@ TEST(TestSSD, AppInvalidArgument) {
 TEST(TestSSD, AppLessArgument) {
 	MockSSD ssd;
 	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
 
 	EXPECT_CALL(ssd, read(_))
 		.Times(0);
@@ -197,16 +199,59 @@ TEST(TestSSD, AppLessArgument) {
 TEST(TestSSD, AppArgumentPassing) {
 	MockSSD ssd;
 	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
 
 	EXPECT_CALL(ssd, read(0))
 		.Times(1);
+
 	EXPECT_CALL(ssd, write(0, "0x00000000"))
 		.Times(1);
 
-	char* cmd1[10] = { "SSD.exe", "R", "0","0x00000000" };
-	app.run(4, cmd1);
+	char* cmd1[10] = { "SSD.exe", "R", "0" };
+	app.run(3, cmd1);
 	char* cmd2[10] = { "SSD.exe", "W", "0","0x00000000" };
 	app.run(4, cmd2);
+}
+
+ACTION(ThrowOutOfRangeException) {
+	throw out_of_range("LBA is out of range");
+}
+
+ACTION(ThrowInvalidArgumentException) {
+	throw invalid_argument("Invalid data");
+}
+
+TEST(TestSSD, AppExceptionHandle) {
+	MockSSD ssd;
+	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
+
+	EXPECT_CALL(ssd, read(-1))
+		.Times(1)
+		.WillOnce(ThrowOutOfRangeException());
+
+	EXPECT_CALL(ssd, write(-1, "0x00000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+
+	EXPECT_CALL(ssd, write(0, "0x000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+	
+	EXPECT_CALL(ssd, write(0, "0000000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+
+	char* cmd1[10] = { "SSD.exe", "R", "-1" };
+	app.run(3, cmd1);
+	char* cmd2[10] = { "SSD.exe", "W", "-1","0x00000000" };
+	app.run(4, cmd2);
+	char* cmd3[10] = { "SSD.exe", "W", "0","0x000000" };
+	app.run(4, cmd3);
+	char* cmd4[10] = { "SSD.exe", "W", "0","0000000000" };
+	app.run(4, cmd4);
 }
 
 TEST(TestSSD, FileReadEmpty) {
