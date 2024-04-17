@@ -90,12 +90,34 @@ public:
 	}
 };
 
-TEST_F(TestSSDFixture, WriteNormal) {
+TEST_F(TestSSDFixture, WriteOneData) {
 	SSD ssd;
 
 	ssd.write(3, "0x00000001");
 
 	EXPECT_EQ("0x00000001", readNand(3));
+}
+
+TEST_F(TestSSDFixture, WriteTwoData) {
+	SSD ssd;
+
+	ssd.write(3, "0x00000001");
+	ssd.write(5, "0x00000020");
+
+	EXPECT_EQ("0x00000001", readNand(3));
+	EXPECT_EQ("0x00000020", readNand(5));
+}
+
+TEST_F(TestSSDFixture, WriteThreeData) {
+	SSD ssd;
+
+	ssd.write(0, "0x00000001");
+	ssd.write(5, "0x00000020");
+	ssd.write(99, "0x000ABCDE");
+
+	EXPECT_EQ("0x00000001", readNand(0));
+	EXPECT_EQ("0x00000020", readNand(5));
+	EXPECT_EQ("0x000ABCDE", readNand(99));
 }
 
 TEST_F(TestSSDFixture, WriteInvalidDataLength) {
@@ -110,6 +132,8 @@ TEST_F(TestSSDFixture, WriteInvalidDataFormat) {
 	SSD ssd;
 
 	EXPECT_THROW(ssd.write(3, "0000000001"), invalid_argument);
+	EXPECT_THROW(ssd.write(3, "xx00000001"), invalid_argument);
+	EXPECT_THROW(ssd.write(3, "x000000001"), invalid_argument);
 }
 
 TEST_F(TestSSDFixture, WriteInvalidAddress) {
