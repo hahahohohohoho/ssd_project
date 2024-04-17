@@ -22,6 +22,7 @@ public:
 			}
 			catch (InvalidInputException e) {
 				cout << e.what() << endl;
+				while (std::cin.get() != '\n');
 				help();
 			}
 			catch (ExitException e) {

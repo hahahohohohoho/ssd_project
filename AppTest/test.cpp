@@ -55,6 +55,7 @@ TEST_F(TestShellTestFixture, TestWrite) {
 
 	shell->write(0, "0xDEADCODE");
 }
+
 TEST_F(TestShellTestFixture, TestRead) {
 
 	EXPECT_CALL(mock_ssd, read(0))
@@ -68,7 +69,7 @@ TEST_F(TestShellTestFixture, TestRead) {
 	EXPECT_EQ(output, "0x01234567\n");
 }
 
-TEST_F(TestShellTestFixture, TESTFullRead) {
+TEST_F(TestShellTestFixture, TestFullRead) {
 	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, read(AllOf(Ge(0), Le(99))))
 		.Times(100)
@@ -79,10 +80,9 @@ TEST_F(TestShellTestFixture, TESTFullRead) {
 	string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(getValidCount(output, testvalue), 100);
-
 }
 
-TEST_F(TestShellTestFixture, TESTFullWrite) {
+TEST_F(TestShellTestFixture, TestFullWrite) {
 	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
@@ -139,6 +139,7 @@ TEST_F(TestShellTestFixture, TestGetValue) {
 
 	EXPECT_THROW(shell->getValue(), InvalidInputException);
 }
+
 TEST_F(TestShellTestFixture, TestGetValueNormal) {
 	setMockInput("0xABCDABCD");
 
@@ -180,6 +181,7 @@ TEST_F(SsdDriverTestFixture, DummySsdRead) {
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "0x12345678\n");
 }
+
 TEST_F(SsdDriverTestFixture, DummySsdWrite) {
 	shell->write(0x1, "0x87654321");
 
