@@ -8,6 +8,13 @@
 
 using namespace std;
 
+class InvalidInputException : public exception {
+public:
+	explicit InvalidInputException(char const* message) : exception(message) {
+
+	}
+};
+
 class TestShell {
 public:
 
@@ -21,42 +28,41 @@ public:
 
 	void start() {
 		while (1) {
-			string command = getCommand();
-			if (command == "fullread") {
-				fullread();
-			}
-			else if (command == "fullwrite") {
-				string value;
-				cin >> value;
+			try {
+				string command = getCommand();
+				if (command == "fullread") {
+					fullread();
+				}
+				else if (command == "fullwrite") {
+					string value = getValue();
+					fullwrite(value);
+				}
+				else if (command == "read") {
+					int lba = getLba();
+					//if (!checkLba(lba)) continue;
+					read(lba);
+				}
+				else if (command == "write") {
+					int lba = getLba();
+					string value = getValue();
+					//cin >> lba >> value;
+					//if (!checkLba(lba) || (!checkValue(value))) continue;
 
-				if (!checkValue(value)) continue;
-
-				fullwrite(value);
+					write(lba, value);
+				}
+				else if (command == "exit") {
+					terminateProcess();
+				}
+				else if (command == "help") {
+					help();
+				}
+				else {
+					cout << "Invalid Command" << endl;
+					help();
+				}
 			}
-			else if (command == "read") {
-				int lba;
-				cin >> lba;
-				if (!checkLba(lba)) continue;
-				read(lba);
-			}
-			else if (command == "write") {
-				int lba;
-				string value;
-				cin >> lba >> value;
-
-				if (!checkLba(lba) || (!checkValue(value))) continue;
-
-				write(lba, value);
-			}
-			else if (command == "exit") {
-				terminateProcess();
-			}
-			else if (command == "help") {
-				help();
-			}
-			else {
-				cout << "Invalid Command" << endl;
-				help();
+			catch (InvalidInputException e) {
+				cout << e.what() << endl;
 			}
 		}
 	}
@@ -67,24 +73,41 @@ public:
 		cin >> str;
 		return str;
 	}
+	int getLba() {
+		int lba;
+		cin >> lba;
+		if (0 > lba || lba > 99) throw InvalidInputException("Invalid Lba");
 
-	bool checkLba(int lba) {
-		if (0 <= lba && lba <= 99) {
-			cout << "invalid lba" << endl;
-			return true;
-		}
-		return false;
+		return lba;
 	}
-
-	bool checkValue(string value) {
+	string getValue() {
+		string value;
+		cin >> value;
 		for (int i = 0; i < value.size(); i++) {
 			if ('0' <= value[i] && value[i] <= '9') continue;
 			if ('A' <= value[i] && value[i] <= 'F') continue;
-			cout << "invalid value" << endl;
-			return false;
+			throw InvalidInputException("Invalid Lba");
 		}
-		return true;
+		return value;
 	}
+
+	//bool checkLba(int lba) {
+	//	if (0 <= lba && lba <= 99) {
+	//		cout << "invalid lba" << endl;
+	//		return true;
+	//	}
+	//	return false;
+	//}
+
+	//bool checkValue(string value) {
+	//	for (int i = 0; i < value.size(); i++) {
+	//		if ('0' <= value[i] && value[i] <= '9') continue;
+	//		if ('A' <= value[i] && value[i] <= 'F') continue;
+	//		cout << "invalid value" << endl;
+	//		return false;
+	//	}
+	//	return true;
+	//}
 
 	void terminateProcess() {
 		exitStrategy->exitProgram();
@@ -127,4 +150,5 @@ public:
 private:
 	IExitStrategy* exitStrategy;
 	ISSD* ssd;
-};
+}
+;

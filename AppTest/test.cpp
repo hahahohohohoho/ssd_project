@@ -119,18 +119,18 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
 
-TEST_F(TestShellTestFixture, TestValidLba) {
-
-	EXPECT_EQ(shell->checkLba(100), false);
-	EXPECT_EQ(shell->checkLba(50), true);
-}
-
-TEST_F(TestShellTestFixture, TestValidValue) {
-
-	EXPECT_EQ(shell->checkValue("qwe"), false);
-	EXPECT_EQ(shell->checkValue("50"), true);
-	EXPECT_EQ(shell->checkValue("ABC"), true);
-}
+//TEST_F(TestShellTestFixture, TestValidLba) {
+//
+//	EXPECT_EQ(shell->checkLba(100), false);
+//	EXPECT_EQ(shell->checkLba(50), true);
+//}
+//
+//TEST_F(TestShellTestFixture, TestValidValue) {
+//
+//	EXPECT_EQ(shell->checkValue("qwe"), false);
+//	EXPECT_EQ(shell->checkValue("50"), true);
+//	EXPECT_EQ(shell->checkValue("ABC"), true);
+//}
 
 class SsdDriverTestFixture : public testing::Test {
 public:
