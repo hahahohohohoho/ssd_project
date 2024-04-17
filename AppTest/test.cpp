@@ -127,6 +127,13 @@ TEST_F(TestShellTestFixture, TestGetLba) {
 
 	EXPECT_THROW(shell->getLba(), InvalidInputException);
 }
+
+TEST_F(TestShellTestFixture, TestGetLbaNormal) {
+	setMockInput("98");
+
+	EXPECT_EQ(shell->getLba(), 98);
+}
+
 TEST_F(TestShellTestFixture, TestGetValue) {
 	setMockInput("zxvasd");
 
