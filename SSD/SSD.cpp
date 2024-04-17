@@ -38,8 +38,15 @@ public:
 		outFile.close();
 	}
   
-	void write(int address, std::string data) {
+	void write(int address, string data) {
+		loadDataFromFile();
 
+		mData[address] = data;
+
+		ofstream outFile("nand.txt");
+		for (int i = 0; i < 100; i++) {
+			outFile << mData[i] << "\n";
+		}
 	}
   
 };
