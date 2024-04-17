@@ -119,6 +119,17 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
 
+TEST_F(TestShellTestFixture, TestGetLba) {
+	setMockInput("123456");
+
+	EXPECT_THROW(shell->getLba(), InvalidInputException);
+}
+TEST_F(TestShellTestFixture, TestGetValue) {
+	setMockInput("zxvasd");
+
+	EXPECT_THROW(shell->getValue(), InvalidInputException);
+}
+
 //TEST_F(TestShellTestFixture, TestValidLba) {
 //
 //	EXPECT_EQ(shell->checkLba(100), false);
