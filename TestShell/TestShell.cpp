@@ -28,17 +28,24 @@ public:
 			else if (command == "fullwrite") {
 				string value;
 				cin >> value;
+
+				if (!checkValue(value)) continue;
+
 				fullwrite(value);
 			}
 			else if (command == "read") {
 				int lba;
 				cin >> lba;
+				if (!checkLba(lba)) continue;
 				read(lba);
 			}
 			else if (command == "write") {
 				int lba;
 				string value;
 				cin >> lba >> value;
+
+				if (!checkLba(lba) || (!checkValue(value))) continue;
+
 				write(lba, value);
 			}
 			else if (command == "exit") {
@@ -48,7 +55,7 @@ public:
 				help();
 			}
 			else {
-				cout << "invalid command" << endl;
+				cout << "Invalid Command" << endl;
 				help();
 			}
 		}
@@ -62,8 +69,10 @@ public:
 	}
 
 	bool checkLba(int lba) {
-		if (0 <= lba && lba <= 99)
+		if (0 <= lba && lba <= 99) {
+			cout << "invalid lba" << endl;
 			return true;
+		}
 		return false;
 	}
 
@@ -71,6 +80,7 @@ public:
 		for (int i = 0; i < value.size(); i++) {
 			if ('0' <= value[i] && value[i] <= '9') continue;
 			if ('A' <= value[i] && value[i] <= 'F') continue;
+			cout << "invalid value" << endl;
 			return false;
 		}
 		return true;
