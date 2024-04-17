@@ -25,15 +25,34 @@ private:
 
 	void initNand() {
 		ofstream mNandOs(TEST_NAND_FILE_PATH);
-		for (int i = 0; i < 100; i++) {
-			mNandOs << "0x00000000" << "\n";
+		for (int i = 0; i < SSD_MAX_DATA_SIZE; i++) {
+			mNandOs << SSD_DEFAULT_DATA << "\n";
 		}
 		mNandOs.close();
 	}
 	void initResult() {
 		ofstream mResultOs(TEST_RESULT_FILE_PATH);
-		mResultOs << "0x00000000";
+		mResultOs << SSD_DEFAULT_DATA;
 		mResultOs.close();
+	}
+	vector<string> readFile(string filePath) {
+		vector<string> data;
+
+		ifstream nandIs(filePath);
+		string line;
+		while (getline(nandIs, line)) {
+			data.push_back(line);
+		}
+		nandIs.close();
+
+		return data;
+	}
+	void writeFile(vector<string> data, string filePath) {
+		ofstream nandOs(filePath);
+		for (string line : data) {
+			nandOs << line << "\n";
+		}
+		nandOs.close();
 	}
 public:
 	void SetUp() override {
@@ -46,47 +65,18 @@ public:
 		initResult();
 	}
 
-	void writeNand(int address, string data) {
-		string nandData[100];
-
-		ifstream nandIs("nand.txt");
-		string line;
-		int index = 0;
-		while (getline(nandIs, line) && line != "") {
-			nandData[index++] = line;
-		}
-		nandIs.close();
-
-		nandData[address] = data;
-
-		ofstream nandOs(TEST_NAND_FILE_PATH);
-		for (int i = 0; i < 100; i++) {
-			nandOs << nandData[i] << "\n";
-		}
-		nandOs.close();
+	void writeNand(int lba, string data) {
+		vector<string> nandData = readFile(TEST_NAND_FILE_PATH);
+		nandData[lba] = data;
+		writeFile(nandData, TEST_NAND_FILE_PATH);
 	}
 
-	string readNand(int address) {
-		ifstream nandIs(TEST_NAND_FILE_PATH);
-		int lineNumber = 0;
-		string line;
-		while (getline(nandIs, line)) {
-			if (lineNumber == address) {
-				nandIs.close();
-				return line;
-			}
-			lineNumber++;
-		}
-		nandIs.close();
-		return "";
+	string readNand(int lba) {
+		return readFile(TEST_NAND_FILE_PATH)[lba];
 	}
 
 	string readResult() {
-		ifstream resultIs(TEST_RESULT_FILE_PATH);
-		string line;
-		getline(resultIs, line);
-		resultIs.close();
-		return line;
+		return readFile(TEST_RESULT_FILE_PATH)[0];
 	}
 };
 
