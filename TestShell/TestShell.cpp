@@ -55,9 +55,20 @@ public:
 				fullread();
 			}
 			else if (command == "fullwrite") {
-				fullwrite("0x01234567");
+				string value;
+				cin >> value;
+				fullwrite(value);
 			}
 			else if (command == "read") {
+				int lba;
+				cin >> lba;
+				read(lba);
+			}
+			else if (command == "write") {
+				int lba;
+				string value;
+				cin >> lba >> value;
+				write(lba, value);
 			}
 			else if (command == "exit") {
 				terminateProcess();
