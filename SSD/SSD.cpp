@@ -39,6 +39,16 @@ public:
 	}
   
 	void write(int address, string data) {
+		if (data.length() != 10) {
+			throw invalid_argument("Invalid data length");
+		}
+		if (data.substr(0, 2) != "0x") {
+			throw invalid_argument("Invalid data format");
+		}
+		if (address < 0 || address > 99) {
+			throw invalid_argument("Invalid address");
+		}
+
 		loadDataFromFile();
 
 		mData[address] = data;
@@ -47,7 +57,7 @@ public:
 		for (int i = 0; i < 100; i++) {
 			outFile << mData[i] << "\n";
 		}
+		outFile.close();
 	}
-  
 };
 
