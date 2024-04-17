@@ -48,8 +48,7 @@ public:
 				help();
 			}
 			else if (command == "testapp1") {
-				fullwrite("0x01234567");
-				fullread();
+				testapp1();
 			}
 
 			else {
