@@ -50,6 +50,10 @@ public:
 			else if (command == "help") {
 				help();
 			}
+			else if (command == "testapp1") {
+				testapp1();
+			}
+
 			else {
 				cout << "invalid command" << endl;
 				help();
@@ -72,8 +76,11 @@ public:
 		ssd->write(LBA, value);
 	}
 
-	void read(int LBA) {
-		cout << ssd->read(LBA) << endl;
+	string read(int LBA) {
+		string value = ssd->read(LBA);
+		cout << value << endl;
+
+		return value;
 	}
 
 	void fullread() {
@@ -86,6 +93,22 @@ public:
 		for (int lba = 0; lba < 100; lba++) {
 			write(lba, value);
 		}
+	}
+
+	bool testapp1() {
+		string writeValue = "0x01234567";
+		fullwrite(writeValue);
+
+		for (int LBA = 0; LBA < 100; ++LBA) {
+			string value = read(LBA).substr(0,10);
+			if (value != writeValue) {
+				cout << "testapp1 Failed - LBA : " << LBA << ", value : " << value << endl;
+				return false;
+			}
+		}
+
+		cout << "testapp1 success" << endl;
+		return true;
 	}
 
 	void help() {
