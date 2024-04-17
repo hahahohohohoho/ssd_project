@@ -2,7 +2,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
-#include "../TestShell/ExitStrategy.cpp"
 #include "../TestShell/SsdDriver.cpp"
 
 #include <fstream>
@@ -43,7 +42,6 @@ public:
 	}
 
 	MockSSD mock_ssd;
-	TestExitStrategy testExit;
 	TestShell* shell;
 
 	std::streambuf* cinBackup;  // cin의 원래 버퍼를 백업
