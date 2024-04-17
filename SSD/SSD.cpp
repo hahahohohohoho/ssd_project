@@ -25,18 +25,13 @@ private:
 	DataArrayFile resultFile{ "result.txt" };
 
 	bool isInvalidData(string data) {
-		if (data.length() != SSD_FIXED_DATA_LENGTH || data.substr(0, 2) != "0x") {
-			return true;
-		}
-		return false;
+		return (data.length() != SSD_FIXED_DATA_LENGTH || data.substr(0, 2) != "0x");
 	}
 
-	bool isInvalidLba(int lba) {
-		if (lba < 0 || lba > (SSD_MAX_DATA_SIZE - 1)) {
-			return true;
-		}
-		return false;
+	bool isInvalidLBA(int lba) {
+		return (lba < 0 || lba >= SSD_MAX_DATA_SIZE);
 	}
+
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
@@ -48,6 +43,9 @@ public:
 	}
 
 	void read(int lba) {
+		if (isInvalidLBA(lba)) {
+			throw out_of_range("LBA is out of range");
+		}
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
 		resultFile.writeFileLines(&mData[lba], 1);
 	}
@@ -56,7 +54,7 @@ public:
 		if (isInvalidData(data)) {
 			throw invalid_argument("Invalid data");
 		}
-		if (isInvalidLba(lba)) {
+		if (isInvalidLBA(lba)) {
 			throw invalid_argument("Invalid LBA");
 		}
   
