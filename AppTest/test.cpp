@@ -141,7 +141,7 @@ public:
 		string dummy_file = "result_dummy.txt";
 		createDummy(dummy_file);
 		ssdDriver = new SSD_Driver(dummy_file);
-		shell = new TestShell(ssdDriver);
+		shell = new TestShell(ssdDriver, &testExit);
 		testing::internal::CaptureStdout();
 
 	}
@@ -162,6 +162,7 @@ public:
 
 	SSD_Driver* ssdDriver;
 	TestShell* shell;
+	TestExitStrategy testExit;
 };
 
 TEST_F(SsdDriverTestFixture, DummySsdRead) {
