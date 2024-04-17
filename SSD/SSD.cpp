@@ -37,6 +37,16 @@ public:
 	}
   
 	void write(int lba, string data) {
+    if (data.length() != 10) {
+			throw invalid_argument("Invalid data length");
+		}
+		if (data.substr(0, 2) != "0x") {
+			throw invalid_argument("Invalid data format");
+		}
+		if (lba < 0 || lba > 99) {
+			throw invalid_argument("Invalid address");
+		}
+  
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
 		mData[lba] = data;
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
