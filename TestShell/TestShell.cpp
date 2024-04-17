@@ -1,5 +1,6 @@
 #pragma once
 #include "ISSD.h"
+#include "IExitStrategy.h"
 
 #include <string>
 #include <vector>
@@ -35,26 +36,6 @@ public:
 	}
 
 	string outputName;
-};
-
-
-class IExitStrategy {
-public:
-	virtual void exitProgram(int status) = 0;
-};
-
-class RealExitStrategy : public IExitStrategy {
-public:
-	void exitProgram(int status) override {
-		std::exit(status);
-	}
-};
-
-class TestExitStrategy : public IExitStrategy {
-public:
-	void exitProgram(int status) override {
-		throw std::runtime_error("Program exit called with status " + std::to_string(status));
-	}
 };
 
 class TestShell {
@@ -102,7 +83,7 @@ public:
 	}
 
 	void terminateProcess() {
-		exitStrategy->exitProgram(0);
+		exitStrategy->exitProgram();
 	}
 
 	void write(int LBA, string value) {
@@ -126,12 +107,16 @@ public:
 	}
 
 	void help() {
-		cout << "- write {no} {data} : {no}번 LBA에 {data}를 기록\n"
-			<< "-- {data} : 16진수 \n"
+
+		std::locale::global(std::locale("en_US.UTF-8"));
+		std::cout.imbue(std::locale());
+
+		cout << "- write {no} {data} : {data} was recorded in LBA {no}\n"
+			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
-			<< "- read {no} : {no}번 LBA를 읽음\n"
-			<< "- exit : shell이 종료\n"
-			<< "- help : 각 명령어의 사용 방법을 출력\n";
+			<< "- read {no} : Read LBA {no} times\n"
+			<< "- exit : shell exits\n"
+			<< "- help : Displays how to use each command\n";
 	}
 
 private:

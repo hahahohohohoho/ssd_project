@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
+#include "../TestShell/ExitStrategy.cpp"
 using namespace testing;
 
 class MockSSD : public ISSD {
@@ -109,10 +110,13 @@ TEST_F(SsdDriverTestFixture, DummySsdRead) {
 	EXPECT_EQ(output, "0x12345678\n");
 }
 TEST_F(SsdDriverTestFixture, DummySsdWrite) {
-	shell->write(0x1,"0x87654321");
+	shell->write(0x1, "0x87654321");
 
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "ssd.exe write 1 0x87654321\n");
+
+	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
+	//EXPECT_THROW(shell.terminateProcess(), std::runtime_error);
 }
 
 TEST(TestShellTEST, TestHelp) {
@@ -125,13 +129,15 @@ TEST(TestShellTEST, TestHelp) {
 
 	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
 
-	string str = "- write {no} {data} : {no}번 LBA에 {data}를 기록\n";
-	str.append("-- {data} : 16진수 \n");
+	std::locale::global(std::locale("en_US.UTF-8"));
+	std::cout.imbue(std::locale());
 
+	string str = "- write {no} {data} : {data} was recorded in LBA {no}\n";
+	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
-	str.append("- read {no} : {no}번 LBA를 읽음\n");
-	str.append("- exit : shell이 종료\n");
-	str.append("- help : 각 명령어의 사용 방법을 출력\n");
+	str.append("- read {no} : Read LBA {no} times\n");
+	str.append("- exit : shell exits\n");
+	str.append("- help : Displays how to use each command\n");
 
 	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }
