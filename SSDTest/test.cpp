@@ -70,7 +70,7 @@ public:
 	void TearDown() override {
 		initNand();
 		initResult();
-		//initBuffer();
+		initBuffer();
 	}
 
 	void writeNand(int lba, string data) {
@@ -110,6 +110,7 @@ TEST_F(TestSSDFixture, WriteOneData) {
 	SSD ssd;
 
 	ssd.write(3, "0x00000001");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(3));
 }
@@ -119,6 +120,7 @@ TEST_F(TestSSDFixture, WriteTwoData) {
 
 	ssd.write(3, "0x00000001");
 	ssd.write(5, "0x00000020");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(3));
 	EXPECT_EQ("0x00000020", readNand(5));
@@ -130,6 +132,7 @@ TEST_F(TestSSDFixture, WriteThreeData) {
 	ssd.write(0, "0x00000001");
 	ssd.write(5, "0x00000020");
 	ssd.write(99, "0x000ABCDE");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(0));
 	EXPECT_EQ("0x00000020", readNand(5));
@@ -196,31 +199,31 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 
 TEST_F(TestSSDFixture, FastReadErase1) {
 	SSD ssd;
+	writeNand(2, "0x11223344");
 	writeBufferE(2, 5);
 
 	ssd.read(2);
 
-	// TODO : check if fastRead is called, use mock or something
 	EXPECT_THAT(readResult(), "0x00000000");
 }
 
 TEST_F(TestSSDFixture, FastReadErase2) {
 	SSD ssd;
+	writeNand(6, "0x11223344");
 	writeBufferE(2, 5);
 
 	ssd.read(6);
 
-	// TODO : check if fastRead is called, use mock or something
 	EXPECT_THAT(readResult(), "0x00000000");
 }
 
 TEST_F(TestSSDFixture, FastReadWrite1) {
 	SSD ssd;
-	writeBufferW(2, "0x00001122");
+	writeNand(5, "0x11223344");
+	writeBufferW(5, "0x00001122");
 
-	ssd.read(2);
+	ssd.read(5);
 
-	// TODO : check if fastRead is called, use mock or something
 	EXPECT_THAT(readResult(), "0x00001122");
 }
 
