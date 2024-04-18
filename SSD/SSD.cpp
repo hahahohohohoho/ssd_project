@@ -115,8 +115,10 @@ public:
 
 			if (item.cmdName == "E") {
 				int size = stoi(item.parameter2);
-				for (int i = lba; i < lba + size; ++i)
+				for (int i = lba; i < lba + size; ++i) {
 					mData[i] = SSD_DEFAULT_DATA;
+				}
+				continue;
 			}
 		}
 
