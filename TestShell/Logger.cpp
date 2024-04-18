@@ -9,7 +9,13 @@ using namespace std;
 class Logger {
 public:
 	Logger() {
-		logFile.open("latest.log");
+		system("mkdir log");
+		logFile.open(".\\log\\latest.log");
+		if (!logFile.is_open()) {
+			cout << "FILE OPEN FAIL" << endl;
+
+			exit(1);
+		}
 		currentLogSize = 0;
 	}
 	~Logger() {
@@ -29,10 +35,10 @@ public:
 			}
 		}
 
-		string logFormat = string(timestamp) + " " + func + " " + log + "\n";
+		string logFormat = string(timestamp) + " " + func + ": " + log + "\n";
 		logFile << logFormat;
 		currentLogSize += logFormat.size();
-
+		
 		if (currentLogSize > 10000) {
 			logFile.close();
 			currentLogSize = 0;
@@ -44,14 +50,14 @@ public:
 			strftime(fileName, sizeof(fileName),
 				"until_%y%m%d_%Hh_%Mm_%Ss.log", timeinfo);
 			
-			string cmd = "ren latest.log " + string(fileName);
+			string cmd = string("move .\\log\\latest.log ") + string(".\\log\\") + string(fileName);
 			system(cmd.c_str());
 
 			logFileList.push(fileName);
 
-			logFile.open("latest.log");
+			logFile.open(".\\log\\latest.log");
 		}
-
+		
 		if (logFileList.size() > 2) {
 			// Compress LogFiles
 
@@ -59,12 +65,12 @@ public:
 				string logfileName = logFileList.front();
 				logFileList.pop();
 
-				string cmd = "ren " + logfileName + ": " + logfileName + ".zip";
+				string cmd = string("move .\\log\\") + logfileName + string(" .\\log\\") + logfileName + string(".zip");
 				system(cmd.c_str());
 			}
 
 		}
-
+		
 		return logFormat;
 	}
 
