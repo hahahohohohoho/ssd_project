@@ -347,4 +347,20 @@ TEST(TestSSD, FileWriteTwoLine) {
 	removeFile.close();
 }
 
+TEST(TestSSD, FileReadSize) {
+	std::ofstream outFile("text.txt");
+	outFile << "ABCD" << endl;
+	outFile << "EFGH" << endl;
+	outFile << "EFGH" << endl;
+	outFile.close();
+
+	DataArrayFile file("text.txt");
+	string buf[5];
+	int size = file.readFileLines(buf, 2);
+	EXPECT_THAT(size, Eq(2));
+
+	std::ofstream removeFile("text.txt");
+	remove("text.txt");
+	removeFile.close();
+}
 
