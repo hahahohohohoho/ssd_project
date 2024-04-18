@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "DataArrayFile.cpp"
+#include "CommandQueue.cpp"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ class SSD : public ISSD {
 private:
 	string mData[SSD_MAX_DATA_SIZE];
 	string writeBuffer[10];
+	CommandQueue cq;
 	DataArrayFile nandFile{ "nand.txt" };
 	DataArrayFile resultFile{ "result.txt" };
 	DataArrayFile bufferFile{ "buffer.txt" };
@@ -99,27 +101,28 @@ public:
 
 	void flush() {
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
-		int size = bufferFile.readFileLines(writeBuffer, 10);
-		for (int i = 0; i < size; ++i) {
-			vector<string> tokens = splitString(writeBuffer[i], ' ');
+		
+		vector<CommandQueueItem> items = cq.getItems();
+		for (int i = 0; i < items.size(); ++i) {
+			CommandQueueItem& item = items[i];
+			int lba = stoi(item.parameter1);
 
-			if (tokens[0] == "W") {
-				mData[stoi(tokens[1])] = tokens[2];
+			if (item.cmdName == "W") {
+				string data = item.parameter2;
+				mData[lba] = data;
 				continue;
 			}
 
-			if (tokens[0] == "E") {
-				for (int i = 0; i < stoi(tokens[2]); ++i) {
-					mData[stoi(tokens[1]) + i] = SSD_DEFAULT_DATA;
+			if (item.cmdName == "E") {
+				int size = stoi(item.parameter2);
+				for (int i = lba; i < lba + size; ++i) {
+					mData[i] = SSD_DEFAULT_DATA;
 				}
 				continue;
 			}
 		}
 
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
-		
-		writeBuffer[0] = "";
-		bufferFile.writeFileLines(writeBuffer, 1);
 	}
 
 	void write(int lba, string data) {
@@ -130,12 +133,11 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
   
-		int size = bufferFile.readFileLines(writeBuffer, 10);		
-		writeBuffer[size++] = "W " + to_string(lba) + " " + data;
-		bufferFile.writeFileLines(writeBuffer, size);
-		
-		if (size >= 10)
+		cq.addItem({ "W", to_string(lba), data });
+		if (cq.isFull()) {
 			flush();
+			cq.clear();
+		}
 	}
 
 	void erase(int lba, int size) {
@@ -146,11 +148,10 @@ public:
 			throw invalid_argument("Invalid erase size");
 		}
 
-		int len = bufferFile.readFileLines(writeBuffer, 10);
-		writeBuffer[len++] = "E " + to_string(lba) + " " + to_string(size);
-		bufferFile.writeFileLines(writeBuffer, len);
-	
-		if (len >= 10)
+		cq.addItem({ "E", to_string(lba), to_string(size)});
+		if (cq.isFull()) {
 			flush();
+			cq.clear();
+		}
 	}
 };
