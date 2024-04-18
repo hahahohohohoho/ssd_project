@@ -12,7 +12,7 @@ using namespace std;
 class TestShell {
 public:
 	explicit TestShell(ISSD* _ssd) : ssd(_ssd) {
-		tcManager = new TCManager("../../tclist", TCManager::STDOUT_REDIRECTION_OFF);
+		tcManager = new TCManager("tclist", TCManager::STDOUT_REDIRECTION_OFF);
 	}
 
 	void start() {

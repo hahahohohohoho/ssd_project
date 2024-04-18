@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 			return 1;
 		}
 
-		TCManager* tcManager = new TCManager("../../tclist", TCManager::STDOUT_REDIRECTION_ON);
+		TCManager* tcManager = new TCManager("tclist", TCManager::STDOUT_REDIRECTION_ON);
 
 		while (std::getline(file, line)) {  // 파일에서 한 줄씩 읽기
 			std::cout << line << "   ---   Run...";

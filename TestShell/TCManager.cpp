@@ -41,9 +41,18 @@ public:
 	}
 
     vector<string> readLinesFromFile(const string& filename) {
+        ofstream file(filename);
+        if (file.is_open()) {    
+            file << "TestScenario_FullWrite" << std::endl;
+            file << "TestScenario_WriteAging" << std::endl;
+            file.close();
+        }
+        else {
+            std::cerr << "Error: Unable to open file for writing." << std::endl;
+        }
+
         ifstream infile(filename);
         vector<string> lines;
-
         if (infile) {
             std::string line;
             while (std::getline(infile, line)) {
