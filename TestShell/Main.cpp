@@ -1,6 +1,6 @@
 #include "TestShell.cpp"
 #include "SsdDriver.cpp"
-#include "TestScenario.cpp"
+#include "TCManager.cpp"
 
 #include <iostream>
 #include <string>
