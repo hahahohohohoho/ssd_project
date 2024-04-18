@@ -63,3 +63,15 @@ public:
 		ssd->erase(stoi(argv[2]), stoi(argv[3]));
 	}
 };
+
+class FlushCommand : public Command {
+public:
+	FlushCommand(string title, string commandName, int requiredArgCnt)
+		: Command(title, commandName, requiredArgCnt) {
+
+	}
+
+	void execute(ISSD* ssd, [[maybe_unused]] char* argv[]) override {
+		ssd->flush();
+	}
+};
