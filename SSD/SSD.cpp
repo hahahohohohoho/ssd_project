@@ -117,10 +117,13 @@ public:
 			throw invalid_argument("Invalid erase size");
 		}
 
-		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
-		for (int i = 0; i < size; i++) {
-			mData[lba + i] = SSD_DEFAULT_DATA;
+		int len = bufferFile.readFileLines(writeBuffer, 10);
+		if (len < 10) {
+			writeBuffer[size++] = "E " + to_string(lba) + " " + to_string(size);
+			bufferFile.writeFileLines(writeBuffer, size);
+			return;
 		}
-		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
+
+		flush();
 	}
 };
