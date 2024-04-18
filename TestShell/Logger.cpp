@@ -59,7 +59,7 @@ public:
 				string logfileName = logFileList.front();
 				logFileList.pop();
 
-				string cmd = "ren " + logfileName + " " + logfileName + ".zip";
+				string cmd = "ren " + logfileName + ": " + logfileName + ".zip";
 				system(cmd.c_str());
 			}
 
