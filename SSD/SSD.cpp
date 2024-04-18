@@ -75,7 +75,6 @@ private:
 		}
 		return false;
 	}
-
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
@@ -131,14 +130,12 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
   
-		int size = bufferFile.readFileLines(writeBuffer, 10);
-		if (size < 10) {
-			writeBuffer[size++] = "W " + to_string(lba) + " " + data;
-			bufferFile.writeFileLines(writeBuffer, size);
-			return;
-		}
-
-		flush();
+		int size = bufferFile.readFileLines(writeBuffer, 10);		
+		writeBuffer[size++] = "W " + to_string(lba) + " " + data;
+		bufferFile.writeFileLines(writeBuffer, size);
+		
+		if (size >= 10)
+			flush();
 	}
 
 	void erase(int lba, int size) {
@@ -150,12 +147,10 @@ public:
 		}
 
 		int len = bufferFile.readFileLines(writeBuffer, 10);
-		if (len < 10) {
-			writeBuffer[len++] = "E " + to_string(lba) + " " + to_string(size);
-			bufferFile.writeFileLines(writeBuffer, len);
-			return;
-		}
-
-		flush();
+		writeBuffer[len++] = "E " + to_string(lba) + " " + to_string(size);
+		bufferFile.writeFileLines(writeBuffer, len);
+	
+		if (len >= 10)
+			flush();
 	}
 };
