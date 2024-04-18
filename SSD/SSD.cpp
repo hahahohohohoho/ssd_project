@@ -15,6 +15,7 @@ public:
 	virtual void read(int lba) = 0;
 	virtual void write(int lba, string data) = 0;
 	virtual void erase(int lba, int size) = 0;
+	virtual void flush(void) = 0;
 };
 
 static const int SSD_MAX_DATA_SIZE = 100;

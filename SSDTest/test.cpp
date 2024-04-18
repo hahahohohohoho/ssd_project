@@ -17,6 +17,7 @@ public:
 	MOCK_METHOD(void, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
 	MOCK_METHOD(void, erase, (int, int), (override));
+	MOCK_METHOD(void, flush, (), (override));
 };
 
 class TestSSDFixture : public Test {
