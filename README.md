@@ -42,6 +42,7 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
 
 # 기능 추가
 - https://url.kr/fu5vxh
+- https://forms.gle/ppaWbXsxgt6Ac8Uy8
 1. SSD - Erase 명령어 추가
     1. SSD : E [ LBA ] [ SIZE ]
         1. 특정 LBA 부터 SIZE 만큼 삭제
