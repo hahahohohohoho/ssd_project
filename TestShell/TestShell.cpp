@@ -5,6 +5,7 @@
 
 #include "ISSD.h"
 #include "CustomException.cpp"
+#include "TestScenario.cpp"
 
 
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 class TestShell {
 public:
 	explicit TestShell(ISSD* _ssd) : ssd(_ssd) {
-
+		tcManager = new TCManager("../../tclist");
 	}
 
 	void start() {
@@ -62,13 +63,10 @@ public:
 		else if (command == "help") {
 			help();
 		}
-		else if (command == "testapp1") {
-			testapp1();
+		else {
+			if (tcManager->run(command) < 0)
+				throw InvalidInputException("Invalid Command");
 		}
-		else if (command == "testapp2") {
-			testapp2();
-		}
-		else throw InvalidInputException("Invalid Command");
 	}
 
 	bool isNumber(const std::string& str) {
@@ -131,22 +129,6 @@ public:
 		}
 	}
 
-	bool testapp1() {
-		string writeValue = "0x01234567";
-		fullwrite(writeValue);
-
-		for (int LBA = 0; LBA < 100; ++LBA) {
-			string value = read(LBA).substr(0,10);
-			if (value != writeValue) {
-				cout << "testapp1 Failed - LBA : " << LBA << ", value : " << value << endl;
-				return false;
-			}
-		}
-
-		cout << "testapp1 success" << endl;
-		return true;
-	}
-
 	void testapp2() {
 		cout << "[TestApp2] Write Aging Test" << endl;
 
@@ -176,20 +158,22 @@ public:
 	}
 
 	void help() {
-		cout << "- write {no} {data} : {data} was recorded in LBA {no}\n"
+		cout
+			<< "[ CMD ]\n"
+			<< "- write {no} {data} : {data} was recorded in LBA {no}\n"
 			<< "-- {data} : hexadecimal \n"
 			<< "-- ex. write 3 0xAAAABBBB\n"
 			<< "- read {no} : Read LBA {no} times\n"
 			<< "- fullwrite {value} : 0~99 LBA Write\n"
 			<< "- fullread : 0~99 LBA Read\n"
-			<< "- testapp1 : fullread/write test\n"
-			<< "- testapp2 : Write Aging Test\n"
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
+		tcManager->printTestCases();
 	}
 
 private:
 	ISSD* ssd;
+	TCManager* tcManager;
 	int lba;
 	string value;
 }
