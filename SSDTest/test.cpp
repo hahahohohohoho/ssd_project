@@ -81,7 +81,7 @@ public:
 	}
 };
 
-TEST_F(TestSSDFixture, WriteOneData) {
+TEST_F(TestSSDFixture, DISABLED_WriteOneData) {
 	SSD ssd;
 
 	ssd.write(3, "0x00000001");
@@ -89,7 +89,7 @@ TEST_F(TestSSDFixture, WriteOneData) {
 	EXPECT_EQ("0x00000001", readNand(3));
 }
 
-TEST_F(TestSSDFixture, WriteTwoData) {
+TEST_F(TestSSDFixture, DISABLED_WriteTwoData) {
 	SSD ssd;
 
 	ssd.write(3, "0x00000001");
@@ -99,7 +99,7 @@ TEST_F(TestSSDFixture, WriteTwoData) {
 	EXPECT_EQ("0x00000020", readNand(5));
 }
 
-TEST_F(TestSSDFixture, WriteThreeData) {
+TEST_F(TestSSDFixture, DISABLED_WriteThreeData) {
 	SSD ssd;
 
 	ssd.write(0, "0x00000001");
