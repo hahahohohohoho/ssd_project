@@ -27,7 +27,10 @@ private:
 
 class TCManager {
 public:
-    TCManager(string filename) {
+    static const int STDOUT_REDIRECTION_ON = 1;
+    static const int STDOUT_REDIRECTION_OFF = 2;
+
+    TCManager(string filename, int _redirection) : redirection(_redirection) {
         vector<string> tclist = readLinesFromFile(filename);
         int tcid = 1;
         for (string tcname : tclist) {
@@ -59,7 +62,12 @@ public:
     int run(string cmd) {
         for (TestCase tc : testcases) {
             if (cmd == tc.getCmd()) {
-                string cmd = tc.getName() + ".exe";
+                string cmd = tc.getName();
+                if (redirection == TCManager::STDOUT_REDIRECTION_ON)
+                     cmd += ".exe > NULL";
+                else
+                     cmd += ".exe";
+
                 return system(cmd.c_str());
             }
         }
@@ -77,4 +85,5 @@ public:
 
 private:
     vector<TestCase> testcases;
+    int redirection = STDOUT_REDIRECTION_ON;
 };
