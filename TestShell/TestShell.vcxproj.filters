@@ -36,7 +36,10 @@
     <ClCompile Include="CustomException.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TestScenario.cpp">
+    <ClCompile Include="Logger.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TCManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
