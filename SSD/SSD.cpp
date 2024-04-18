@@ -1,8 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "DataArrayFile.cpp"
 
@@ -23,8 +25,10 @@ static const int SSD_MAX_ERASE_SIZE = 10;
 class SSD : public ISSD {
 private:
 	string mData[SSD_MAX_DATA_SIZE];
+	string writeBuffer[10];
 	DataArrayFile nandFile{ "nand.txt" };
 	DataArrayFile resultFile{ "result.txt" };
+	DataArrayFile bufferFile{ "buffer.txt" };
 
 	bool isInvalidData(string data) {
 		return (data.length() != SSD_FIXED_DATA_LENGTH || data.substr(0, 2) != "0x");
@@ -56,6 +60,37 @@ public:
 		resultFile.writeFileLines(&mData[lba], 1);
 	}
 
+	void flush() {
+		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
+		int size = bufferFile.readFileLines(writeBuffer, 10);
+		for (int i = 0; i < size; ++i) {
+			vector<string> tokens;
+			stringstream ss(writeBuffer[i]);
+			string token;
+
+			while (getline(ss, token, ' ')) {
+				tokens.push_back(token);
+			}
+
+			if (tokens[0] == "W") {
+				mData[stoi(tokens[1])] = tokens[2];
+				continue;
+			}
+
+			if (tokens[0] == "E") {
+				for (int i = 0; i < stoi(tokens[2]); ++i) {
+					mData[stoi(tokens[1])] = SSD_DEFAULT_DATA;
+				}
+				continue;
+			}
+		}
+
+		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
+		
+		writeBuffer[0] = "";
+		bufferFile.writeFileLines(writeBuffer, 1);
+	}
+
 	void write(int lba, string data) {
 		if (isInvalidData(data)) {
 			throw invalid_argument("Invalid data");
@@ -64,9 +99,14 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
   
-		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
-		mData[lba] = data;
-		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
+		int size = bufferFile.readFileLines(writeBuffer, 10);
+		if (size < 10) {
+			writeBuffer[size++] = "W " + to_string(lba) + " " + data;
+			bufferFile.writeFileLines(writeBuffer, size);
+			return;
+		}
+
+		flush();
 	}
 
 	void erase(int lba, int size) {
