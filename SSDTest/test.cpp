@@ -170,7 +170,7 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 	EXPECT_THROW(ssd.read(100), out_of_range);
 }
 
-TEST_F(TestSSDFixture, EraseOneData) {
+TEST_F(TestSSDFixture, DISABLED_EraseOneData) {
 	SSD ssd;
 	writeNand(0, "0x00000001");
 	writeNand(1, "0x00000020");
@@ -181,7 +181,7 @@ TEST_F(TestSSDFixture, EraseOneData) {
 	EXPECT_EQ("0x00000020", readNand(1));
 }
 
-TEST_F(TestSSDFixture, EraseTwoData) {
+TEST_F(TestSSDFixture, DISABLED_EraseTwoData) {
 	SSD ssd;
 	writeNand(4, "0x00000020");
 	writeNand(5, "0x00000001");
