@@ -12,11 +12,13 @@ class ISSD {
 public:
 	virtual void read(int lba) = 0;
 	virtual void write(int lba, string data) = 0;
+	virtual void erase(int lba, int size) = 0;
 };
 
 static const int SSD_MAX_DATA_SIZE = 100;
 static const int SSD_FIXED_DATA_LENGTH = 10;
 static const string SSD_DEFAULT_DATA = "0x00000000";
+static const int SSD_MAX_ERASE_SIZE = 10;
 
 class SSD : public ISSD {
 private:
@@ -30,6 +32,10 @@ private:
 
 	bool isInvalidLBA(int lba) {
 		return (lba < 0 || lba >= SSD_MAX_DATA_SIZE);
+	}
+
+	bool isInvalidEraseSize(int size) {
+		return (size < 0 || size > SSD_MAX_ERASE_SIZE);
 	}
 
 public:
@@ -62,5 +68,19 @@ public:
 		mData[lba] = data;
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
 	}
-};
 
+	void erase(int lba, int size) {
+		if (isInvalidLBA(lba)) {
+			throw invalid_argument("Invalid LBA");
+		}
+		if (isInvalidEraseSize(size)) {
+			throw invalid_argument("Invalid erase size");
+		}
+
+		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
+		for (int i = 0; i < size; i++) {
+			mData[lba + i] = SSD_DEFAULT_DATA;
+		}
+		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
+	}
+};

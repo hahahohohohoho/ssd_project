@@ -16,6 +16,7 @@ class MockSSD : public ISSD {
 public:
 	MOCK_METHOD(void, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
+	MOCK_METHOD(void, erase, (int, int), (override));
 };
 
 class TestSSDFixture : public Test {
@@ -126,7 +127,7 @@ TEST_F(TestSSDFixture, WriteInvalidDataFormat) {
 	EXPECT_THROW(ssd.write(3, "x000000001"), invalid_argument);
 }
 
-TEST_F(TestSSDFixture, WriteInvalidAddress) {
+TEST_F(TestSSDFixture, WriteInvalidLba) {
 	SSD ssd;
 
 	EXPECT_THROW(ssd.write(-1, "0x00000001"), invalid_argument);
@@ -168,6 +169,48 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 	EXPECT_THROW(ssd.read(100), out_of_range);
 }
 
+TEST_F(TestSSDFixture, EraseOneData) {
+	SSD ssd;
+	writeNand(0, "0x00000001");
+	writeNand(1, "0x00000020");
+
+	ssd.erase(0, 1);
+
+	EXPECT_EQ("0x00000000", readNand(0));
+	EXPECT_EQ("0x00000020", readNand(1));
+}
+
+TEST_F(TestSSDFixture, EraseTwoData) {
+	SSD ssd;
+	writeNand(4, "0x00000020");
+	writeNand(5, "0x00000001");
+	writeNand(6, "0x00000020");
+	writeNand(7, "0x00000300");
+
+	ssd.erase(5, 2);
+
+	EXPECT_EQ("0x00000020", readNand(4));
+	EXPECT_EQ("0x00000000", readNand(5));
+	EXPECT_EQ("0x00000000", readNand(6));
+	EXPECT_EQ("0x00000300", readNand(7));
+}
+
+TEST_F(TestSSDFixture, EraseInvalidLba) {
+	SSD ssd;
+
+	EXPECT_THROW(ssd.erase(-1, 3), invalid_argument);
+	EXPECT_THROW(ssd.erase(100, 3), invalid_argument);
+	EXPECT_THROW(ssd.erase(101, 3), invalid_argument);
+}
+
+TEST_F(TestSSDFixture, EraseInvalidSize) {
+	SSD ssd;
+
+	EXPECT_THROW(ssd.erase(5, -1), invalid_argument);
+	EXPECT_THROW(ssd.erase(15, 11), invalid_argument);
+	EXPECT_THROW(ssd.erase(20, 12), invalid_argument);
+}
+
 TEST(TestSSD, AppInvalidArgument) {
 	MockSSD ssd;
 	Application app(&ssd);
@@ -184,6 +227,8 @@ TEST(TestSSD, AppInvalidArgument) {
 TEST(TestSSD, AppLessArgument) {
 	MockSSD ssd;
 	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
 
 	EXPECT_CALL(ssd, read(_))
 		.Times(0);
@@ -197,16 +242,59 @@ TEST(TestSSD, AppLessArgument) {
 TEST(TestSSD, AppArgumentPassing) {
 	MockSSD ssd;
 	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
 
 	EXPECT_CALL(ssd, read(0))
 		.Times(1);
+
 	EXPECT_CALL(ssd, write(0, "0x00000000"))
 		.Times(1);
 
-	char* cmd1[10] = { "SSD.exe", "R", "0","0x00000000" };
-	app.run(4, cmd1);
+	char* cmd1[10] = { "SSD.exe", "R", "0" };
+	app.run(3, cmd1);
 	char* cmd2[10] = { "SSD.exe", "W", "0","0x00000000" };
 	app.run(4, cmd2);
+}
+
+ACTION(ThrowOutOfRangeException) {
+	throw out_of_range("LBA is out of range");
+}
+
+ACTION(ThrowInvalidArgumentException) {
+	throw invalid_argument("Invalid data");
+}
+
+TEST(TestSSD, AppExceptionHandle) {
+	MockSSD ssd;
+	Application app(&ssd);
+	app.addCommand(new ReadCommand("Read", "R", 3));
+	app.addCommand(new WriteCommand("Write", "W", 4));
+
+	EXPECT_CALL(ssd, read(-1))
+		.Times(1)
+		.WillOnce(ThrowOutOfRangeException());
+
+	EXPECT_CALL(ssd, write(-1, "0x00000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+
+	EXPECT_CALL(ssd, write(0, "0x000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+	
+	EXPECT_CALL(ssd, write(0, "0000000000"))
+		.Times(1)
+		.WillOnce(ThrowInvalidArgumentException());
+
+	char* cmd1[10] = { "SSD.exe", "R", "-1" };
+	app.run(3, cmd1);
+	char* cmd2[10] = { "SSD.exe", "W", "-1","0x00000000" };
+	app.run(4, cmd2);
+	char* cmd3[10] = { "SSD.exe", "W", "0","0x000000" };
+	app.run(4, cmd3);
+	char* cmd4[10] = { "SSD.exe", "W", "0","0000000000" };
+	app.run(4, cmd4);
 }
 
 TEST(TestSSD, FileReadEmpty) {
@@ -259,4 +347,20 @@ TEST(TestSSD, FileWriteTwoLine) {
 	removeFile.close();
 }
 
+TEST(TestSSD, FileReadSize) {
+	std::ofstream outFile("text.txt");
+	outFile << "ABCD" << endl;
+	outFile << "EFGH" << endl;
+	outFile << "EFGH" << endl;
+	outFile.close();
+
+	DataArrayFile file("text.txt");
+	string buf[5];
+	int size = file.readFileLines(buf, 2);
+	EXPECT_THAT(size, Eq(2));
+
+	std::ofstream removeFile("text.txt");
+	remove("text.txt");
+	removeFile.close();
+}
 

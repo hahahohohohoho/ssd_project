@@ -22,12 +22,16 @@ public:
 		return ret;
 	}
 
-	void readFileLines(string buf[], int size) {
+	int readFileLines(string buf[], int size) {
 		ifstream inFile(filePath);
+		int cnt = 0;
 		for (int i = 0; i < size; ++i) {
-			getline(inFile, buf[i]);
+			if (!getline(inFile, buf[i]))
+				break;
+			cnt++;
 		}
 		inFile.close();
+		return cnt;
 	}
 
 	void writeFileLines(string buf[], int size) {
