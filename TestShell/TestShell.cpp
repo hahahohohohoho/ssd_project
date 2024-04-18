@@ -49,12 +49,22 @@ public:
 		}
 		else if (command == "read") {
 			getLba();
-			read(this->lba);
+			read(this->start_lba);
 		}
 		else if (command == "write") {
 			getLba();
 			getValue();
-			write(this->lba, this->value);
+			write(this->start_lba, this->value);
+		}
+		else if (command == "erase") {
+			getLba();
+			getSize();
+			erase(this->start_lba, this->size);
+		}
+		else if (command == "erase_range") {
+			getLba();
+			getEndLba();
+			erase_range(this->start_lba, this->end_lba);
 		}
 		else if (command == "exit") {
 			terminateProcess();
@@ -84,9 +94,33 @@ public:
 		if (!isNumber(str_lba))
 			throw InvalidInputException("Invalid Lba");
 
-		this->lba = stoi(str_lba);
-		if (0 > this->lba || this->lba > 99)
+		this->start_lba = stoi(str_lba);
+		if (0 > this->start_lba || this->start_lba > 99)
 			throw InvalidInputException("Invalid Lba");
+	}
+
+	void getEndLba() {
+		string end_lba;
+		cin >> end_lba;
+
+		if (!isNumber(end_lba))
+			throw InvalidInputException("Invalid Lba");
+
+		this->end_lba = stoi(end_lba);
+		if (0 > this->end_lba || this->end_lba > 99)
+			throw InvalidInputException("Invalid Lba");
+	}
+
+	void getSize() {
+		string size;
+		cin >> size;
+
+		if (!isNumber(size))
+			throw InvalidInputException("Invalid Size");
+
+		this->size = stoi(size);
+		if (this->size < 0 || this->size > 10)
+			throw InvalidInputException("Invalid Size");
 	}
 
 	void getValue() {
@@ -103,6 +137,20 @@ public:
 
 	void terminateProcess() {
 		throw ExitException("Exit Program");
+	}
+
+	void erase(int lba, int size) {
+		ssd->erase(lba, size);
+	}
+
+	void erase_range(int start_lba, int end_lba) {
+		int start = start_lba;
+		while (end_lba >= start) {
+			int rem = end_lba - start + 1;
+			int size = (rem > 10) ? (10) : (rem);
+			ssd->erase(start, size);
+			start += 10;
+		}
 	}
 
 	void write(int lba, string value) {
@@ -137,6 +185,8 @@ public:
 			<< "- read {no} : Read LBA {no} times\n"
 			<< "- fullwrite {value} : 0~99 LBA Write\n"
 			<< "- fullread : 0~99 LBA Read\n"
+			<< "- erase {lba} {size}\n"
+			<< "- erase_range {start lba} {end lba}\n"
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
 		tcManager->printTestCases();
@@ -145,7 +195,7 @@ public:
 private:
 	ISSD* ssd;
 	TCManager* tcManager;
-	int lba;
+	int start_lba, end_lba;
+	int size;
 	string value;
-}
-;
+};
