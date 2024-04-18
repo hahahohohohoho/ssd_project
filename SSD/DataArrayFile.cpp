@@ -34,7 +34,7 @@ public:
 		return cnt;
 	}
 
-	void writeFileLines(string buf[], int size) {
+	void writeFileLines(const string buf[], int size) {
 		ofstream outFile(filePath);
 		for (int i = 0; i < size; ++i) {
 			outFile << buf[i] << endl;
