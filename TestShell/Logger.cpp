@@ -82,12 +82,10 @@ private:
 			"[%y.%m.%d %H:%M]", timeinfo);
 
 		func.append("()");
-		if (func.size() < 30) {
-			while (func.size() < 30) {
-				func.append(" ");
-			}
+		while (func.size() < 30) {
+			func.append(" ");
 		}
-
+		
 		string logFormat = string(timestamp) + " " + func + ": " + log + "\n";
 		logFile << logFormat;
 		currentLogSize += logFormat.size();
