@@ -16,6 +16,7 @@ class MockSSD : public ISSD {
 public:
 	MOCK_METHOD(void, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
+	MOCK_METHOD(void, erase, (int, int), (override));
 };
 
 class TestSSDFixture : public Test {
@@ -126,7 +127,7 @@ TEST_F(TestSSDFixture, WriteInvalidDataFormat) {
 	EXPECT_THROW(ssd.write(3, "x000000001"), invalid_argument);
 }
 
-TEST_F(TestSSDFixture, WriteInvalidAddress) {
+TEST_F(TestSSDFixture, WriteInvalidLba) {
 	SSD ssd;
 
 	EXPECT_THROW(ssd.write(-1, "0x00000001"), invalid_argument);
@@ -166,6 +167,48 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 
 	EXPECT_THROW(ssd.read(-1), out_of_range);
 	EXPECT_THROW(ssd.read(100), out_of_range);
+}
+
+TEST_F(TestSSDFixture, EraseOneData) {
+	SSD ssd;
+	writeNand(0, "0x00000001");
+	writeNand(1, "0x00000020");
+
+	ssd.erase(0, 1);
+
+	EXPECT_EQ("0x00000000", readNand(0));
+	EXPECT_EQ("0x00000020", readNand(1));
+}
+
+TEST_F(TestSSDFixture, EraseTwoData) {
+	SSD ssd;
+	writeNand(4, "0x00000020");
+	writeNand(5, "0x00000001");
+	writeNand(6, "0x00000020");
+	writeNand(7, "0x00000300");
+
+	ssd.erase(5, 2);
+
+	EXPECT_EQ("0x00000020", readNand(4));
+	EXPECT_EQ("0x00000000", readNand(5));
+	EXPECT_EQ("0x00000000", readNand(6));
+	EXPECT_EQ("0x00000300", readNand(7));
+}
+
+TEST_F(TestSSDFixture, EraseInvalidLba) {
+	SSD ssd;
+
+	EXPECT_THROW(ssd.erase(-1, 3), invalid_argument);
+	EXPECT_THROW(ssd.erase(100, 3), invalid_argument);
+	EXPECT_THROW(ssd.erase(101, 3), invalid_argument);
+}
+
+TEST_F(TestSSDFixture, EraseInvalidSize) {
+	SSD ssd;
+
+	EXPECT_THROW(ssd.erase(5, -1), invalid_argument);
+	EXPECT_THROW(ssd.erase(15, 11), invalid_argument);
+	EXPECT_THROW(ssd.erase(20, 12), invalid_argument);
 }
 
 TEST(TestSSD, AppInvalidArgument) {

@@ -52,3 +52,14 @@ public:
 	}
 };
 
+class EraseCommand : public Command {
+public:
+	EraseCommand(string title, string commandName, int requiredArgCnt)
+		: Command(title, commandName, requiredArgCnt) {
+
+	}
+
+	void execute(ISSD* ssd, char* argv[]) override {
+		ssd->erase(stoi(argv[2]), stoi(argv[3]));
+	}
+};
