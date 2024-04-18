@@ -110,7 +110,7 @@ public:
 
 			if (tokens[0] == "E") {
 				for (int i = 0; i < stoi(tokens[2]); ++i) {
-					mData[stoi(tokens[1])] = SSD_DEFAULT_DATA;
+					mData[stoi(tokens[1]) + i] = SSD_DEFAULT_DATA;
 				}
 				continue;
 			}

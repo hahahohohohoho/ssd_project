@@ -1,8 +1,9 @@
 #include <string>
 #include <iostream>
 #include "../TestShell/SsdDriver.cpp"
+#include "../TestShell/TCResult.h"
 
-void writeAgingTest() {
+int writeAgingTest() {
 	SSD_Driver* ssd = new SSD_Driver("result.txt");
 
 	cout << "\nStep1 > write lba(0~5) value(0xAAAABBBB)" << endl;
@@ -24,14 +25,21 @@ void writeAgingTest() {
 		if (value != "0x12345678")
 		{
 			cout << "\n[DONE] TEST FAILED!" << endl;
-			return;
+			return TCResult::FAIL;
 		}
 	}
 	cout << "\n[DONE] TEST SUCCESS!" << endl;
+	return TCResult::PASS;
 }
 
 int main()
 {
 	cout << "[Write Aging Test] Start" << endl;
-	writeAgingTest();
+	try {
+		exit(writeAgingTest());
+	}
+	catch (exception& e) {
+		cout << e.what() << endl;
+		exit(TCResult::ERROR);
+	}
 }
