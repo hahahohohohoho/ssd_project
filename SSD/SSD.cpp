@@ -27,7 +27,6 @@ static const int SSD_MAX_ERASE_SIZE = 10;
 class SSD : public ISSD {
 private:
 	string mData[SSD_MAX_DATA_SIZE];
-	string writeBuffer[10];
 	CommandQueue cq;
 	DataArrayFile nandFile{ "nand.txt" };
 	DataArrayFile resultFile{ "result.txt" };
@@ -76,6 +75,53 @@ private:
 			}
 		}
 		return false;
+	}
+
+	void fastWrite(CommandQueueItem newCommand) {
+		cq.addItem(newCommand);
+		vector<CommandQueueItem> buffer = cq.getItems();
+		vector<int> removeCommandIndexes;
+
+		if (newCommand.cmdName == "E") {
+			int newCommandEraseFirstLba = stoi(newCommand.parameter1);
+			int newCommandEraseLastLba = newCommandEraseFirstLba + stoi(newCommand.parameter2) - 1;
+
+			for (int i = buffer.size() - 2; i >= 0; i--) {
+				if (buffer[i].cmdName == "W") {
+					int writeLba = stoi(buffer[i].parameter1);
+					if (writeLba >= newCommandEraseFirstLba && writeLba <= newCommandEraseLastLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+				else if (buffer[i].cmdName == "E") {
+					int eraseFirstLba = stoi(buffer[i].parameter1);
+					int eraseLastLba = eraseFirstLba + stoi(buffer[i].parameter2) - 1;
+					if (eraseFirstLba >= newCommandEraseFirstLba && eraseLastLba <= newCommandEraseLastLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+			}
+		}
+		else if (newCommand.cmdName == "W") {
+			int newCommandWriteLba = stoi(newCommand.parameter1);
+
+			for (int i = buffer.size() - 2; i >= 0; i--) {
+				if (buffer[i].cmdName == "W") {
+					int writeLba = stoi(buffer[i].parameter1);
+					if (writeLba == newCommandWriteLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+			}
+		}
+
+		for (int commandIndex : removeCommandIndexes)
+			cq.removeItem(commandIndex);
+
+		if (cq.isFull()) {
+			flush();
+			cq.clear();
+		}
 	}
 public:
 	SSD() {
@@ -133,11 +179,7 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
   
-		cq.addItem({ "W", to_string(lba), data });
-		if (cq.isFull()) {
-			flush();
-			cq.clear();
-		}
+		fastWrite({ "W", to_string(lba), data });
 	}
 
 	void erase(int lba, int size) {
@@ -148,10 +190,6 @@ public:
 			throw invalid_argument("Invalid erase size");
 		}
 
-		cq.addItem({ "E", to_string(lba), to_string(size)});
-		if (cq.isFull()) {
-			flush();
-			cq.clear();
-		}
+		fastWrite({ "E", to_string(lba), to_string(size) });
 	}
 };

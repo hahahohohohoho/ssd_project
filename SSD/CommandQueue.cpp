@@ -62,4 +62,15 @@ public:
 		}
 		return ret;
 	}
+
+	void removeItem(int index) {
+		string newBuffer[MAX_ITEM_SIZE];
+		int size = file.readFileLines(buffer, MAX_ITEM_SIZE);
+		for (int i = 0; i < size; i++) {
+			if (i == index)
+				continue;
+			newBuffer[i] = buffer[i];
+		}
+		file.writeFileLines(newBuffer, size);
+	}
 };
