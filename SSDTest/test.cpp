@@ -17,12 +17,14 @@ public:
 	MOCK_METHOD(void, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
 	MOCK_METHOD(void, erase, (int, int), (override));
+	MOCK_METHOD(void, flush, (), (override));
 };
 
 class TestSSDFixture : public Test {
 private:
 	const string TEST_NAND_FILE_PATH = "nand.txt";
 	const string TEST_RESULT_FILE_PATH = "result.txt";
+	const string TEST_BUFFER_FILE_PATH = "buffer.txt";
 
 	void initNand() {
 		ofstream mNandOs(TEST_NAND_FILE_PATH);
@@ -34,6 +36,10 @@ private:
 	void initResult() {
 		ofstream mResultOs(TEST_RESULT_FILE_PATH);
 		mResultOs << SSD_DEFAULT_DATA;
+		mResultOs.close();
+	}
+	void initBuffer() {
+		ofstream mResultOs(TEST_BUFFER_FILE_PATH);
 		mResultOs.close();
 	}
 	vector<string> readFile(string filePath) {
@@ -59,17 +65,37 @@ public:
 	void SetUp() override {
 		initNand();
 		initResult();
+		initBuffer();
 	}
 
 	void TearDown() override {
 		initNand();
 		initResult();
+		initBuffer();
 	}
 
 	void writeNand(int lba, string data) {
 		vector<string> nandData = readFile(TEST_NAND_FILE_PATH);
 		nandData[lba] = data;
 		writeFile(nandData, TEST_NAND_FILE_PATH);
+	}
+
+	void writeBufferW(int lba, string data) {
+		vector<string> bufferData = readFile(TEST_BUFFER_FILE_PATH);
+		string newLine = "W ";
+		newLine.append(to_string(lba).append(" "));
+		newLine.append(data.append(" "));
+		bufferData.push_back(newLine);
+		writeFile(bufferData, TEST_BUFFER_FILE_PATH);
+	}
+
+	void writeBufferE(int lba, int size) {
+		vector<string> bufferData = readFile(TEST_BUFFER_FILE_PATH);
+		string newLine = "E ";
+		newLine.append(to_string(lba).append(" "));
+		newLine.append(to_string(size).append(" "));
+		bufferData.push_back(newLine);
+		writeFile(bufferData, TEST_BUFFER_FILE_PATH);
 	}
 
 	string readNand(int lba) {
@@ -85,6 +111,7 @@ TEST_F(TestSSDFixture, WriteOneData) {
 	SSD ssd;
 
 	ssd.write(3, "0x00000001");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(3));
 }
@@ -94,6 +121,7 @@ TEST_F(TestSSDFixture, WriteTwoData) {
 
 	ssd.write(3, "0x00000001");
 	ssd.write(5, "0x00000020");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(3));
 	EXPECT_EQ("0x00000020", readNand(5));
@@ -105,6 +133,7 @@ TEST_F(TestSSDFixture, WriteThreeData) {
 	ssd.write(0, "0x00000001");
 	ssd.write(5, "0x00000020");
 	ssd.write(99, "0x000ABCDE");
+	ssd.flush();
 
 	EXPECT_EQ("0x00000001", readNand(0));
 	EXPECT_EQ("0x00000020", readNand(5));
@@ -169,12 +198,43 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 	EXPECT_THROW(ssd.read(100), out_of_range);
 }
 
+TEST_F(TestSSDFixture, FastReadErase1) {
+	SSD ssd;
+	writeNand(2, "0x11223344");
+	writeBufferE(2, 5);
+
+	ssd.read(2);
+
+	EXPECT_THAT(readResult(), "0x00000000");
+}
+
+TEST_F(TestSSDFixture, FastReadErase2) {
+	SSD ssd;
+	writeNand(6, "0x11223344");
+	writeBufferE(2, 5);
+
+	ssd.read(6);
+
+	EXPECT_THAT(readResult(), "0x00000000");
+}
+
+TEST_F(TestSSDFixture, FastReadWrite1) {
+	SSD ssd;
+	writeNand(5, "0x11223344");
+	writeBufferW(5, "0x00001122");
+
+	ssd.read(5);
+
+	EXPECT_THAT(readResult(), "0x00001122");
+}
+
 TEST_F(TestSSDFixture, EraseOneData) {
 	SSD ssd;
 	writeNand(0, "0x00000001");
 	writeNand(1, "0x00000020");
 
 	ssd.erase(0, 1);
+	ssd.flush();
 
 	EXPECT_EQ("0x00000000", readNand(0));
 	EXPECT_EQ("0x00000020", readNand(1));
@@ -188,6 +248,7 @@ TEST_F(TestSSDFixture, EraseTwoData) {
 	writeNand(7, "0x00000300");
 
 	ssd.erase(5, 2);
+	ssd.flush();
 
 	EXPECT_EQ("0x00000020", readNand(4));
 	EXPECT_EQ("0x00000000", readNand(5));
@@ -217,7 +278,7 @@ TEST(TestSSD, AppInvalidArgument) {
 
 	EXPECT_CALL(ssd, read(_))
 		.Times(0);
-	EXPECT_CALL(ssd, write(_,_))
+	EXPECT_CALL(ssd, write(_, _))
 		.Times(0);
 
 	char* cmd[10] = { "SSD.exe", "E", "0","0x00000000" };
@@ -282,7 +343,7 @@ TEST(TestSSD, AppExceptionHandle) {
 	EXPECT_CALL(ssd, write(0, "0x000000"))
 		.Times(1)
 		.WillOnce(ThrowInvalidArgumentException());
-	
+
 	EXPECT_CALL(ssd, write(0, "0000000000"))
 		.Times(1)
 		.WillOnce(ThrowInvalidArgumentException());
@@ -363,4 +424,3 @@ TEST(TestSSD, FileReadSize) {
 	remove("text.txt");
 	removeFile.close();
 }
-

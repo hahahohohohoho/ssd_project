@@ -90,3 +90,16 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
     1. Test Shell 기능 추가하면 Test Shell 빌드 해야한다.
     2. Test Scenario 1 / 2 / 3 / … 분리
     3. Test Scenario 추가되어도 Test Shell 빌드는 할 필요가 없어야 한다.
+
+# 발표 양식
+- template : https://url.kr/6dnhvs
+- 발표 내용
+  - 필수
+  - 조원 소개 및 역할
+  - 기능 구현 소개
+  - TDD 활용 예시
+  - Mocking 활용 예시
+  - 리팩토링 통한 클린코드 전후 결과 비교
+  - 소감
+  - 프로젝트 시연도 포함되어야 함
+    - ex) buffer 파일로 구현 -> 시연하고 buffer역할의 파일 보여주고 이런거?

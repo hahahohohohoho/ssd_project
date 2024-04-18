@@ -3,6 +3,7 @@
 #include<iostream>
 #include <fstream>
 #include <vector>
+#include "TCResult.h"
 using namespace std;
 
 class TestCase {
@@ -26,20 +27,32 @@ private:
 
 class TCManager {
 public:
-    TCManager(string filename) {
+    static const int STDOUT_REDIRECTION_ON = 1;
+    static const int STDOUT_REDIRECTION_OFF = 2;
+
+    TCManager(string filename, int _redirection) : redirection(_redirection) {
         vector<string> tclist = readLinesFromFile(filename);
-        int tcid = 0;
+        int tcid = 1;
         for (string tcname : tclist) {
-            string cmd = "tc" + to_string(tcid);
+            string cmd = "testapp" + to_string(tcid);
             testcases.push_back(TestCase{ cmd, tcname });
             tcid++;
         }
 	}
 
     vector<string> readLinesFromFile(const string& filename) {
+        ofstream file(filename);
+        if (file.is_open()) {    
+            file << "TestScenario_FullWrite" << std::endl;
+            file << "TestScenario_WriteAging" << std::endl;
+            file.close();
+        }
+        else {
+            std::cerr << "Error: Unable to open file for writing." << std::endl;
+        }
+
         ifstream infile(filename);
         vector<string> lines;
-
         if (infile) {
             std::string line;
             while (std::getline(infile, line)) {
@@ -56,16 +69,18 @@ public:
     }
 
     int run(string cmd) {
-        
         for (TestCase tc : testcases) {
             if (cmd == tc.getCmd()) {
-                string cmd = tc.getName() + ".exe";
-                system(cmd.c_str());
-                return 0;
+                string cmd = tc.getName();
+                if (redirection == TCManager::STDOUT_REDIRECTION_ON)
+                     cmd += ".exe >> test_result.log";
+                else
+                     cmd += ".exe";
+
+                return system(cmd.c_str());
             }
         }
-
-        return -1;
+        return TCResult::FAIL;
     }
 
     void printTestCases() {
@@ -79,4 +94,5 @@ public:
 
 private:
     vector<TestCase> testcases;
+    int redirection = STDOUT_REDIRECTION_ON;
 };

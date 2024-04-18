@@ -1,10 +1,11 @@
 #include <string>
 #include <iostream>
 #include "../TestShell/SsdDriver.cpp"
+#include "../TestShell/TCResult.h"
 
 using namespace std;
 
-void fullWriteTest() {
+int fullWriteTest() {
 	SSD_Driver* ssd = new SSD_Driver("result.txt");
 
 	string writeValue = "0x01234567";
@@ -16,14 +17,23 @@ void fullWriteTest() {
 		string value = ssd->read(lba).substr(0, 10);
 		if (value != writeValue) {
 			cout << "FullWrite Test Failed - LBA : " << lba << ", value : " << value << endl;
-			return;
+			return TCResult::FAIL;
 		}
 	}
 
 	cout << "[DONE] FullWrite Test Success" << endl;
+	return TCResult::PASS;
 }
 
 int main() {
+	cout << "\n\n========================" << endl;
 	cout << "[FullWrite Test] Start" << endl;
-	fullWriteTest();
+
+	try {
+		exit(fullWriteTest());
+	}
+	catch (exception& e) {
+		cout << e.what() << endl;
+		exit(TCResult::ERROR);
+	}
 }
