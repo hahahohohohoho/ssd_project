@@ -85,9 +85,8 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
             1. 연속적인 range에 erase 있으면, erase range으로 대체
             2. 같은 lba에 write/erase 있으면 write는 skip 
         2. Fast Read
-            1. 
+            1. read할때 write buffer 부터 확인, nana 접근 최소화
 5. 시나리오 추가 시, 재빌드 이슈 해결
     1. Test Shell 기능 추가하면 Test Shell 빌드 해야한다.
     2. Test Scenario 1 / 2 / 3 / … 분리
     3. Test Scenario 추가되어도 Test Shell 빌드는 할 필요가 없어야 한다.
-    4. ???
