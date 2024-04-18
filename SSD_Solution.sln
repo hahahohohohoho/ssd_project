@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루션 항목", "{35B11DBA-7220-4A51-8F2A-050B50B81340}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		tclist = tclist
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestShell", "TestShell\TestShell.vcxproj", "{85DB968F-E8AC-42F3-B2F9-9384F3BC458A}"
