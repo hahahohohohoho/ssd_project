@@ -26,7 +26,7 @@ public:
 		ifstream inFile(filePath);
 		int cnt = 0;
 		for (int i = 0; i < size; ++i) {
-			if (!getline(inFile, buf[i]))
+			if (!getline(inFile, buf[i]) || buf[i] == "")
 				break;
 			cnt++;
 		}
