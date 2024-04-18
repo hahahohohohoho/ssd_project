@@ -61,14 +61,17 @@ public:
 		else if (command == "help") {
 			help();
 		}
-		else if (command == "testapp1") {
-			testapp1();
-		}
-		else if (command == "testapp2") {
-			testapp2();
+		else if (command == "testapp1" || command == "testapp2") {
+			runScript(command);
 		}
 		else throw InvalidInputException("Invalid Command");
 	}
+
+	void runScript(string command) {
+		if (command == "testapp1") testapp1();
+		else if (command == "testapp2") testapp2();
+	}
+
 
 	bool isNumber(const std::string& str) {
 		for (char c : str) {
