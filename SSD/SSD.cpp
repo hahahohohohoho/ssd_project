@@ -111,7 +111,7 @@ public:
 
 			if (tokens[0] == "E") {
 				for (int i = 0; i < stoi(tokens[2]); ++i) {
-					mData[stoi(tokens[1])] = SSD_DEFAULT_DATA;
+					mData[stoi(tokens[1]) + i] = SSD_DEFAULT_DATA;
 				}
 				continue;
 			}
@@ -151,8 +151,8 @@ public:
 
 		int len = bufferFile.readFileLines(writeBuffer, 10);
 		if (len < 10) {
-			writeBuffer[size++] = "E " + to_string(lba) + " " + to_string(size);
-			bufferFile.writeFileLines(writeBuffer, size);
+			writeBuffer[len++] = "E " + to_string(lba) + " " + to_string(size);
+			bufferFile.writeFileLines(writeBuffer, len);
 			return;
 		}
 
