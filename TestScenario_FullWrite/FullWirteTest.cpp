@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void fullwrite_test() {
+void fullWriteTest() {
 	SSD_Driver* ssd = new SSD_Driver("result.txt");
 
 	string writeValue = "0x01234567";
@@ -25,5 +25,5 @@ void fullwrite_test() {
 
 int main() {
 	cout << "[FullWrite Test] Start" << endl;
-	fullwrite_test();
+	fullWriteTest();
 }
