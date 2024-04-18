@@ -43,6 +43,39 @@ private:
 		return (size < 0 || size > SSD_MAX_ERASE_SIZE);
 	}
 
+	vector<std::string> splitString(const std::string& input, char delim) {
+		vector<std::string> tokens;
+		istringstream iss(input);
+		string token;
+
+		while (getline(iss, token, delim)) {
+			tokens.push_back(token);
+		}
+
+		return tokens;
+	}
+
+	bool fastRead(int lba) {
+		string buffer[10];
+		int size = bufferFile.readFileLines(buffer, 10);
+		for (int i = size - 1; i >= 0; i--) {
+			vector<string> tokens = splitString(buffer[i], ' ');
+			if (tokens.size() != 3) {
+				throw invalid_argument("buffer has invalid data");
+			}
+
+			if (tokens[0] == "W" && stoi(tokens[1]) == lba) {
+				resultFile.writeFileLines(&tokens[2], 1);
+				return true;
+			}
+			else if (tokens[0] == "E" && lba >= stoi(tokens[1]) && lba < stoi(tokens[1]) + stoi(tokens[2])) {
+				resultFile.writeFileLines(&SSD_DEFAULT_DATA, 1);
+				return true;
+			}
+		}
+		return false;
+	}
+
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
@@ -57,6 +90,10 @@ public:
 		if (isInvalidLBA(lba)) {
 			throw out_of_range("LBA is out of range");
 		}
+		if (fastRead(lba)) {
+			return;
+		}
+
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
 		resultFile.writeFileLines(&mData[lba], 1);
 	}
@@ -65,13 +102,7 @@ public:
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
 		int size = bufferFile.readFileLines(writeBuffer, 10);
 		for (int i = 0; i < size; ++i) {
-			vector<string> tokens;
-			stringstream ss(writeBuffer[i]);
-			string token;
-
-			while (getline(ss, token, ' ')) {
-				tokens.push_back(token);
-			}
+			vector<string> tokens = splitString(writeBuffer[i], ' ');
 
 			if (tokens[0] == "W") {
 				mData[stoi(tokens[1])] = tokens[2];

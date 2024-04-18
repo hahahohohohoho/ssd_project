@@ -24,6 +24,7 @@ class TestSSDFixture : public Test {
 private:
 	const string TEST_NAND_FILE_PATH = "nand.txt";
 	const string TEST_RESULT_FILE_PATH = "result.txt";
+	const string TEST_BUFFER_FILE_PATH = "buffer.txt";
 
 	void initNand() {
 		ofstream mNandOs(TEST_NAND_FILE_PATH);
@@ -35,6 +36,10 @@ private:
 	void initResult() {
 		ofstream mResultOs(TEST_RESULT_FILE_PATH);
 		mResultOs << SSD_DEFAULT_DATA;
+		mResultOs.close();
+	}
+	void initBuffer() {
+		ofstream mResultOs(TEST_BUFFER_FILE_PATH);
 		mResultOs.close();
 	}
 	vector<string> readFile(string filePath) {
@@ -60,17 +65,37 @@ public:
 	void SetUp() override {
 		initNand();
 		initResult();
+		initBuffer();
 	}
 
 	void TearDown() override {
 		initNand();
 		initResult();
+		//initBuffer();
 	}
 
 	void writeNand(int lba, string data) {
 		vector<string> nandData = readFile(TEST_NAND_FILE_PATH);
 		nandData[lba] = data;
 		writeFile(nandData, TEST_NAND_FILE_PATH);
+	}
+
+	void writeBufferW(int lba, string data) {
+		vector<string> bufferData = readFile(TEST_BUFFER_FILE_PATH);
+		string newLine = "W ";
+		newLine.append(to_string(lba).append(" "));
+		newLine.append(data.append(" "));
+		bufferData.push_back(newLine);
+		writeFile(bufferData, TEST_BUFFER_FILE_PATH);
+	}
+
+	void writeBufferE(int lba, int size) {
+		vector<string> bufferData = readFile(TEST_BUFFER_FILE_PATH);
+		string newLine = "E ";
+		newLine.append(to_string(lba).append(" "));
+		newLine.append(to_string(size).append(" "));
+		bufferData.push_back(newLine);
+		writeFile(bufferData, TEST_BUFFER_FILE_PATH);
 	}
 
 	string readNand(int lba) {
@@ -170,6 +195,36 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 	EXPECT_THROW(ssd.read(100), out_of_range);
 }
 
+TEST_F(TestSSDFixture, FastReadErase1) {
+	SSD ssd;
+	writeBufferE(2, 5);
+
+	ssd.read(2);
+
+	// TODO : check if fastRead is called, use mock or something
+	EXPECT_THAT(readResult(), "0x00000000");
+}
+
+TEST_F(TestSSDFixture, FastReadErase2) {
+	SSD ssd;
+	writeBufferE(2, 5);
+
+	ssd.read(6);
+
+	// TODO : check if fastRead is called, use mock or something
+	EXPECT_THAT(readResult(), "0x00000000");
+}
+
+TEST_F(TestSSDFixture, FastReadWrite1) {
+	SSD ssd;
+	writeBufferW(2, "0x00001122");
+
+	ssd.read(2);
+
+	// TODO : check if fastRead is called, use mock or something
+	EXPECT_THAT(readResult(), "0x00001122");
+}
+
 TEST_F(TestSSDFixture, DISABLED_EraseOneData) {
 	SSD ssd;
 	writeNand(0, "0x00000001");
@@ -218,7 +273,7 @@ TEST(TestSSD, AppInvalidArgument) {
 
 	EXPECT_CALL(ssd, read(_))
 		.Times(0);
-	EXPECT_CALL(ssd, write(_,_))
+	EXPECT_CALL(ssd, write(_, _))
 		.Times(0);
 
 	char* cmd[10] = { "SSD.exe", "E", "0","0x00000000" };
@@ -283,7 +338,7 @@ TEST(TestSSD, AppExceptionHandle) {
 	EXPECT_CALL(ssd, write(0, "0x000000"))
 		.Times(1)
 		.WillOnce(ThrowInvalidArgumentException());
-	
+
 	EXPECT_CALL(ssd, write(0, "0000000000"))
 		.Times(1)
 		.WillOnce(ThrowInvalidArgumentException());
@@ -364,4 +419,3 @@ TEST(TestSSD, FileReadSize) {
 	remove("text.txt");
 	removeFile.close();
 }
-
