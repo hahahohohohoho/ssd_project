@@ -73,7 +73,7 @@ public:
             if (cmd == tc.getCmd()) {
                 string cmd = tc.getName();
                 if (redirection == TCManager::STDOUT_REDIRECTION_ON)
-                     cmd += ".exe > NULL";
+                     cmd += ".exe >> test_result.log";
                 else
                      cmd += ".exe";
 

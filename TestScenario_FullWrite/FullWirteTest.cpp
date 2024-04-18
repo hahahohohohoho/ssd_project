@@ -26,6 +26,7 @@ int fullWriteTest() {
 }
 
 int main() {
+	cout << "\n\n========================" << endl;
 	cout << "[FullWrite Test] Start" << endl;
 
 	try {

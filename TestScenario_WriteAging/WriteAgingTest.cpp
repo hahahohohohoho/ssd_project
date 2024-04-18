@@ -34,6 +34,7 @@ int writeAgingTest() {
 
 int main()
 {
+	cout << "\n\n========================" << endl;
 	cout << "[Write Aging Test] Start" << endl;
 	try {
 		exit(writeAgingTest());
