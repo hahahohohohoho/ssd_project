@@ -3,6 +3,7 @@
 #include<iostream>
 #include <fstream>
 #include <vector>
+#include "TCResult.h"
 using namespace std;
 
 class TestCase {
@@ -28,9 +29,9 @@ class TCManager {
 public:
     TCManager(string filename) {
         vector<string> tclist = readLinesFromFile(filename);
-        int tcid = 0;
+        int tcid = 1;
         for (string tcname : tclist) {
-            string cmd = "tc" + to_string(tcid);
+            string cmd = "testapp" + to_string(tcid);
             testcases.push_back(TestCase{ cmd, tcname });
             tcid++;
         }
@@ -56,16 +57,13 @@ public:
     }
 
     int run(string cmd) {
-        
         for (TestCase tc : testcases) {
             if (cmd == tc.getCmd()) {
                 string cmd = tc.getName() + ".exe";
-                system(cmd.c_str());
-                return 0;
+                return system(cmd.c_str());
             }
         }
-
-        return -1;
+        return TCResult::FAIL;
     }
 
     void printTestCases() {

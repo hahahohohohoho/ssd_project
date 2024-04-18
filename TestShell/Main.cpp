@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <cstdio>
+#include "TCResult.h"
 
 int main(int argc, char* argv[]) {
 	if (argc > 1) {
@@ -21,7 +22,7 @@ int main(int argc, char* argv[]) {
 
 		while (std::getline(file, line)) {  // 파일에서 한 줄씩 읽기
 			std::cout << line << "   ---   Run...";
-			if (tcManager->run(line) == 1) {
+			if (tcManager->run(line) == TCResult::PASS) {
 				cout << "Pass\n";
 			}
 			else {
