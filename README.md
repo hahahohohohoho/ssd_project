@@ -39,6 +39,21 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
 - project 기능 관련 : sejin.choi@mincoding.co.kr
 - TDD 관련 문의 : jeonghwan.seo@mincoding.co.kr
 
+# 개발 요구사항
+1. 최초 기능 요구사항  
+[O] write 
+[O] read  
+[O] fullwrite  
+[O] fullread  
+[O] exit  
+[O] help  
+
+2. 추가 요구사항  
+[O] SSD 명령어 추가 (Erase)  
+[O] Logger 기능 추가  
+[O] Runner 기능 추가  
+[O] SSD Write Buffer 기능 추가  
+[O] Test 시나리오 추가시 재빌드 이슈 해결  
 
 # 기능 추가
 - https://url.kr/fu5vxh
