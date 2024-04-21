@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "DataArrayFile.cpp"
+#include "CommandQueue.cpp"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ static const int SSD_MAX_ERASE_SIZE = 10;
 class SSD : public ISSD {
 private:
 	string mData[SSD_MAX_DATA_SIZE];
-	string writeBuffer[10];
+	CommandQueue cq;
 	DataArrayFile nandFile{ "nand.txt" };
 	DataArrayFile resultFile{ "result.txt" };
 	DataArrayFile bufferFile{ "buffer.txt" };
@@ -75,6 +76,53 @@ private:
 		}
 		return false;
 	}
+
+	void fastWrite(CommandQueueItem newCommand) {
+		cq.addItem(newCommand);
+		vector<CommandQueueItem> buffer = cq.getItems();
+		vector<int> removeCommandIndexes;
+
+		if (newCommand.cmdName == "E") {
+			int newCommandEraseFirstLba = stoi(newCommand.parameter1);
+			int newCommandEraseLastLba = newCommandEraseFirstLba + stoi(newCommand.parameter2) - 1;
+
+			for (int i = buffer.size() - 2; i >= 0; i--) {
+				if (buffer[i].cmdName == "W") {
+					int writeLba = stoi(buffer[i].parameter1);
+					if (writeLba >= newCommandEraseFirstLba && writeLba <= newCommandEraseLastLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+				else if (buffer[i].cmdName == "E") {
+					int eraseFirstLba = stoi(buffer[i].parameter1);
+					int eraseLastLba = eraseFirstLba + stoi(buffer[i].parameter2) - 1;
+					if (eraseFirstLba >= newCommandEraseFirstLba && eraseLastLba <= newCommandEraseLastLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+			}
+		}
+		else if (newCommand.cmdName == "W") {
+			int newCommandWriteLba = stoi(newCommand.parameter1);
+
+			for (int i = buffer.size() - 2; i >= 0; i--) {
+				if (buffer[i].cmdName == "W") {
+					int writeLba = stoi(buffer[i].parameter1);
+					if (writeLba == newCommandWriteLba) {
+						removeCommandIndexes.push_back(i);
+					}
+				}
+			}
+		}
+
+		for (int commandIndex : removeCommandIndexes)
+			cq.removeItem(commandIndex);
+
+		if (cq.isFull()) {
+			flush();
+			cq.clear();
+		}
+	}
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
@@ -99,27 +147,28 @@ public:
 
 	void flush() {
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
-		int size = bufferFile.readFileLines(writeBuffer, 10);
-		for (int i = 0; i < size; ++i) {
-			vector<string> tokens = splitString(writeBuffer[i], ' ');
+		
+		vector<CommandQueueItem> items = cq.getItems();
+		for (int i = 0; i < items.size(); ++i) {
+			CommandQueueItem& item = items[i];
+			int lba = stoi(item.parameter1);
 
-			if (tokens[0] == "W") {
-				mData[stoi(tokens[1])] = tokens[2];
+			if (item.cmdName == "W") {
+				string data = item.parameter2;
+				mData[lba] = data;
 				continue;
 			}
 
-			if (tokens[0] == "E") {
-				for (int i = 0; i < stoi(tokens[2]); ++i) {
-					mData[stoi(tokens[1]) + i] = SSD_DEFAULT_DATA;
+			if (item.cmdName == "E") {
+				int size = stoi(item.parameter2);
+				for (int i = lba; i < lba + size; ++i) {
+					mData[i] = SSD_DEFAULT_DATA;
 				}
 				continue;
 			}
 		}
 
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
-		
-		writeBuffer[0] = "";
-		bufferFile.writeFileLines(writeBuffer, 1);
 	}
 
 	void write(int lba, string data) {
@@ -130,12 +179,7 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
   
-		int size = bufferFile.readFileLines(writeBuffer, 10);		
-		writeBuffer[size++] = "W " + to_string(lba) + " " + data;
-		bufferFile.writeFileLines(writeBuffer, size);
-		
-		if (size >= 10)
-			flush();
+		fastWrite({ "W", to_string(lba), data });
 	}
 
 	void erase(int lba, int size) {
@@ -146,11 +190,6 @@ public:
 			throw invalid_argument("Invalid erase size");
 		}
 
-		int len = bufferFile.readFileLines(writeBuffer, 10);
-		writeBuffer[len++] = "E " + to_string(lba) + " " + to_string(size);
-		bufferFile.writeFileLines(writeBuffer, len);
-	
-		if (len >= 10)
-			flush();
+		fastWrite({ "E", to_string(lba), to_string(size) });
 	}
 };

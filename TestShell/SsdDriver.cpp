@@ -29,5 +29,11 @@ public:
 		system(cmd.c_str());
 	}
 
+	void erase(int lba, int size) override {
+		string cmd = "SSD.exe E " + to_string(lba) + " " + to_string(size);
+		cout << cmd << endl;
+		system(cmd.c_str());
+	}
+
 	string outputName;
 };

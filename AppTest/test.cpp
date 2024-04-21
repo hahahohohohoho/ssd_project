@@ -12,6 +12,7 @@ class MockSSD : public ISSD {
 public:
 	MOCK_METHOD(string, read, (int), (override));
 	MOCK_METHOD(void, write, (int, string), (override));
+	MOCK_METHOD(void, erase, (int, int), (override));
 };
 
 class TestShellTestFixture : public testing::Test {

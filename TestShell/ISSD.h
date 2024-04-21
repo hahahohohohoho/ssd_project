@@ -6,4 +6,5 @@ class ISSD {
 public:
 	virtual string read(int lba) = 0;
 	virtual void write(int lba, string value) = 0;
+	virtual void erase(int lba, int size) = 0;
 };
