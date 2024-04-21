@@ -118,3 +118,6 @@ CHORE: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정 같
   - 소감
   - 프로젝트 시연도 포함되어야 함
     - ex) buffer 파일로 구현 -> 시연하고 buffer역할의 파일 보여주고 이런거?
+
+# 발표 PPT URL
+https://docs.google.com/presentation/d/1a6MLNjCw3fusmp37X4YOAIX82IxH18S1H6Qu_j0QnEs/edit#slide=id.g2ce59ba892e_0_0
