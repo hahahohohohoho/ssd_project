@@ -68,7 +68,7 @@ void LoggerSingleton::separateLogFiles(void) {
 	}
 }
 void LoggerSingleton::compressLogFiles(void) {
-	while (logFileList.size() > FILE_COMPRESS_THRESHOLD_COUNT) {
+	while (logFileList.size() >= FILE_COMPRESS_THRESHOLD_COUNT) {
 		string logfileName = logFileList.front();
 		logFileList.pop();
 
