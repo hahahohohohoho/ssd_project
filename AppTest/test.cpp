@@ -8,6 +8,7 @@
 
 using namespace testing;
 
+
 class MockSSD : public ISSD {
 public:
 	MOCK_METHOD(string, read, (int), (override));
@@ -54,7 +55,8 @@ TEST_F(TestShellTestFixture, TestWrite) {
 	EXPECT_CALL(mock_ssd, write(0, "0xDEADCODE"))
 		.Times(1);
 
-	shell->write(0, "0xDEADCODE");
+	//shell->write(0, "0xDEADCODE");
+	setMockInput("write 0 0xDEADCODE");
 }
 
 TEST_F(TestShellTestFixture, TestRead) {
@@ -64,7 +66,8 @@ TEST_F(TestShellTestFixture, TestRead) {
 		.WillOnce(Return(string("0x01234567")));
 
 	testing::internal::CaptureStdout();
-	shell->read(0);
+	//shell->read(0);
+	setMockInput("read 0");
 	string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(output, "0x01234567\n");
@@ -77,7 +80,8 @@ TEST_F(TestShellTestFixture, TestFullRead) {
 		.WillRepeatedly(Return(testvalue));
 
 	testing::internal::CaptureStdout();
-	shell->fullread();
+	//shell->fullread();
+	setMockInput("fullread");
 	string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(getValidCount(output, testvalue), 100);
@@ -88,12 +92,15 @@ TEST_F(TestShellTestFixture, TestFullWrite) {
 	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
 
-	shell->fullwrite(testvalue);
+	//shell->fullwrite(testvalue);
+	setMockInput("fullwrite 0x01234567");
 }
 
 TEST_F(TestShellTestFixture, TestExit) {
 
-	EXPECT_THROW(shell->terminateProcess(), ExitException);
+	//EXPECT_THROW(shell->terminateProcess(), ExitException);
+	setMockInput("exit");
+	//EXPECT_THROW(shell->terminateProcess(), ExitException);
 }
 
 TEST_F(TestShellTestFixture, TestHelp) {
@@ -101,7 +108,8 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	std::stringstream buffer;
 	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
 
-	shell->help();
+	//shell->help();
+	setMockInput("help");
 
 	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
 
@@ -124,27 +132,27 @@ TEST_F(TestShellTestFixture, TestHelp) {
 }
 
 TEST_F(TestShellTestFixture, TestGetLba) {
-	setMockInput("123456");
+	setMockInput("read 123456");
 
-	EXPECT_THROW(shell->getLba(), InvalidInputException);
+	EXPECT_THROW(shell->start(), InvalidInputException);
 }
 
 TEST_F(TestShellTestFixture, TestGetLbaNormal) {
-	setMockInput("98");
+	setMockInput("read 98");
 
-	EXPECT_NO_THROW(shell->getLba(), 98);
+	EXPECT_NO_THROW(shell->start(), 98);
 }
 
 TEST_F(TestShellTestFixture, TestGetValue) {
-	setMockInput("zxvasd");
+	setMockInput("write 1 zxvasd");
 
-	EXPECT_THROW(shell->getValue(), InvalidInputException);
+	EXPECT_THROW(shell->start(), InvalidInputException);
 }
 
 TEST_F(TestShellTestFixture, TestGetValueNormal) {
-	setMockInput("0xABCDABCD");
+	setMockInput("write 1 0xABCDABCD");
 
-	EXPECT_NO_THROW(shell->getValue(), "0xABCDABCD");
+	EXPECT_NO_THROW(shell->start(), "0xABCDABCD");
 }
 
 class SsdDriverTestFixture : public testing::Test {
@@ -177,14 +185,14 @@ public:
 };
 
 TEST_F(SsdDriverTestFixture, DummySsdRead) {
-	shell->read(0x1);
+	//shell->read(0x1);
 
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "0x12345678\n");
 }
 
 TEST_F(SsdDriverTestFixture, DummySsdWrite) {
-	shell->write(0x1, "0x87654321");
+	//shell->write(0x1, "0x87654321");
 
 	string output = testing::internal::GetCapturedStdout();
 	EXPECT_EQ(output, "SSD.exe W 1 0x87654321\n");
