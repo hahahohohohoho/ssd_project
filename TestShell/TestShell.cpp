@@ -28,12 +28,10 @@ public:
 				processCommand();
 			}
 			catch (InvalidInputException e) {
-				cout << e.what() << endl;
 				log->print(e.what());
 				while (std::cin.get() != '\n');
 			}
 			catch (ExitException e) {
-				cout << e.what() << endl;
 				log->print(e.what());
 				break;
 			}
@@ -52,7 +50,7 @@ public:
 		string command;
 		cout << "\nCMD > ";
 		cin >> command;
-		log->print("CMD > " + command);
+		log->print("Input Command : " + command);
 		return command;
 	}
 

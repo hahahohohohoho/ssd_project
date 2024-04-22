@@ -2,6 +2,7 @@
 #include "ISSD.h"
 #include "CustomException.cpp"
 #include "TCManager.cpp"
+#include "Logger.h"
 
 using namespace std;
 
@@ -29,13 +30,20 @@ protected:
 
     string read(int lba) {
         string value = ssd->read(lba);
-        cout << value << endl;
+
+        LoggerSingleton::GetInstancePtr()->print("LBA : " + to_string(lba) + ", Value : " + value);
 
         return value;
     }
 
     void write(int lba, string value) {
         ssd->write(lba, value);
+        LoggerSingleton::GetInstancePtr()->print("LBA : " + to_string(lba) + ", Value : " + value);
+    }
+
+    void erase(int lba, int size) {
+        ssd->erase(lba, size);
+        LoggerSingleton::GetInstancePtr()->print("LBA : " + to_string(lba) + ", Size : " + to_string(size));
     }
 };
 
@@ -95,7 +103,7 @@ public:
     EraseCommand(int lba, int size) : lba(lba), size(size) {}
 
     virtual void execute() {
-        ssd->erase(lba, size);
+        erase(lba, size);
     }
 };
 
@@ -112,7 +120,7 @@ public:
         while (end_lba >= start) {
             int rem = end_lba - start + 1;
             int size = (rem > 10) ? (10) : (rem);
-            ssd->erase(start, size);
+            erase(start, size);
             start += 10;
         }
     }
