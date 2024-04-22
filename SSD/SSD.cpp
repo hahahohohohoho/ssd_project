@@ -89,6 +89,7 @@ public:
 		}
 
 		nandFile.writeFileLines(mData, SSD_MAX_DATA_SIZE);
+		cq.clear();
 	}
 
 	void write(int lba, string data) {
@@ -103,7 +104,6 @@ public:
 
 		if (cq.isFull()) {
 			flush();
-			cq.clear();
 		}
 	}
 
@@ -119,7 +119,6 @@ public:
 
 		if (cq.isFull()) {
 			flush();
-			cq.clear();
 		}
 	}
 };
