@@ -96,8 +96,6 @@ public:
         }
     }
 
-
-
 private:
     vector<TestCase> testcases;
     int redirection = STDOUT_REDIRECTION_ON;
