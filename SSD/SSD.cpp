@@ -82,11 +82,8 @@ public:
 	void flush() {
 		nandFile.readFileLines(mData, SSD_MAX_DATA_SIZE);
 		
-		vector<CommandQueueItem> items = cq.getItems();
-		for (int i = 0; i < items.size(); ++i) {
-			CommandQueueItem& item = items[i];
+		for (CommandQueueItem item : cq.getItems()) {
 			int lba = stoi(item.parameter1);
-
 			if (item.cmdName == "W") {
 				string data = item.parameter2;
 				mData[lba] = data;
