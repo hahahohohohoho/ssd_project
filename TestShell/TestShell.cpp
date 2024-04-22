@@ -23,13 +23,11 @@ public:
 				processCommand(getCommand());
 			}
 			catch (InvalidInputException e) {
-				cout << e.what() << endl;
 				log->print(e.what());
 				while (std::cin.get() != '\n');
 				help();
 			}
 			catch (ExitException e) {
-				cout << e.what() << endl;
 				log->print(e.what());
 				break;
 			}
@@ -40,7 +38,7 @@ public:
 		string command;
 		cout << "\nCMD > ";
 		cin >> command;
-		log->print("CMD > " + command);
+		log->print("Input Command : " + command);
 		return command;
 	}
 	
@@ -79,7 +77,6 @@ public:
 		}
 		else {
 			if (tcManager->run(command) < 0) {
-				log->print("Invalid Command");
 				throw InvalidInputException("Invalid Command");
 			}
 		}
@@ -168,7 +165,6 @@ public:
 
 	string read(int lba) {
 		string value = ssd->read(lba);
-		cout << value << endl;
 		log->print("LBA : " + to_string(lba) + ", VALUE : " + value);
 		return value;
 	}
@@ -186,20 +182,6 @@ public:
 	}
 
 	void help() {
-		cout
-			<< "[ CMD ]\n"
-			<< "- write {no} {data} : {data} was recorded in LBA {no}\n"
-			<< "-- {data} : hexadecimal \n"
-			<< "-- ex. write 3 0xAAAABBBB\n"
-			<< "- read {no} : Read LBA {no} times\n"
-			<< "- fullwrite {value} : 0~99 LBA Write\n"
-			<< "- fullread : 0~99 LBA Read\n"
-			<< "- erase {lba} {size}\n"
-			<< "- erase_range {start lba} {end lba}\n"
-			<< "- exit : shell exits\n"
-			<< "- help : Displays how to use each command\n";
-		tcManager->printTestCases();
-
 		log->print("[ CMD ]");
 		log->print("- write {no} {data} : {data} was recorded in LBA {no}");
 		log->print("-- {data} : hexadecimal ");
@@ -211,6 +193,9 @@ public:
 		log->print("- erase_range {start lba} {end lba}");
 		log->print("- exit : shell exits");
 		log->print("- help : Displays how to use each command");
+
+		tcManager->printTestCases();
+
 	}
 
 private:

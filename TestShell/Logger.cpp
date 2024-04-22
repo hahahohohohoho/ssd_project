@@ -26,6 +26,8 @@ LoggerSingleton::~LoggerSingleton() {
 }
 
 string LoggerSingleton::print(string log, string func) {
+	cout << log << endl;
+
 	openFile();
 
 	string logFormat = collectLog(log, func);
