@@ -8,6 +8,7 @@
 
 #include "DataArrayFile.cpp"
 #include "CommandQueue.cpp"
+#include "CmdString.h"
 
 using namespace std;
 
@@ -83,13 +84,13 @@ public:
 		
 		for (CommandQueueItem item : cq.getItems()) {
 			int lba = stoi(item.parameter1);
-			if (item.cmdName == "W") {
+			if (item.cmdName == CMD[WRITE]) {
 				string data = item.parameter2;
 				mData[lba] = data;
 				continue;
 			}
 
-			if (item.cmdName == "E") {
+			if (item.cmdName == CMD[ERASE]) {
 				int size = stoi(item.parameter2);
 				for (int i = lba; i < lba + size; ++i) {
 					mData[i] = SSD_DEFAULT_DATA;
@@ -109,7 +110,7 @@ public:
 			throw invalid_argument("Invalid LBA");
 		}
 		
-		cq.addItem({ "W", to_string(lba), data });
+		cq.addItem({ CMD[WRITE], to_string(lba), data});
 
 		if (cq.isFull()) {
 			flush();
@@ -125,7 +126,7 @@ public:
 			throw invalid_argument("Invalid erase size");
 		}
 
-		cq.addItem({ "E", to_string(lba), to_string(size) });
+		cq.addItem({ CMD[ERASE], to_string(lba), to_string(size) });
 
 		if (cq.isFull()) {
 			flush();
