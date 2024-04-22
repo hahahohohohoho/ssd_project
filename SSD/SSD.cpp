@@ -55,27 +55,6 @@ private:
 
 		return tokens;
 	}
-
-	bool fastRead(int lba) {
-		string buffer[10];
-		int size = bufferFile.readFileLines(buffer, 10);
-		for (int i = size - 1; i >= 0; i--) {
-			vector<string> tokens = splitString(buffer[i], ' ');
-			if (tokens.size() != 3) {
-				throw invalid_argument("buffer has invalid data");
-			}
-
-			if (tokens[0] == "W" && stoi(tokens[1]) == lba) {
-				resultFile.writeFileLines(&tokens[2], 1);
-				return true;
-			}
-			else if (tokens[0] == "E" && lba >= stoi(tokens[1]) && lba < stoi(tokens[1]) + stoi(tokens[2])) {
-				resultFile.writeFileLines(&SSD_DEFAULT_DATA, 1);
-				return true;
-			}
-		}
-		return false;
-	}
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
@@ -90,7 +69,9 @@ public:
 		if (isInvalidLBA(lba)) {
 			throw out_of_range("LBA is out of range");
 		}
-		if (fastRead(lba)) {
+		string data = cq.findData(lba);
+		if (!data.empty()) {
+			resultFile.writeFileLines(&data, 1);
 			return;
 		}
 

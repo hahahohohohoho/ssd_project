@@ -79,6 +79,22 @@ public:
 		setItems(items);
 	}
 
+	string findData(int lba) {
+		vector<CommandQueueItem> items = getItems();
+		reverse(items.begin(), items.end());
+
+		for (auto iter = items.begin(); iter < items.end(); iter++) {
+			if (iter->cmdName == "W" && stoi(iter->parameter1) == lba) {
+				return iter->parameter2;
+			}
+			else if (iter->cmdName == "E" && lba >= stoi(iter->parameter1)) {
+				return "0x00000000";
+			}
+		}
+
+		return "";
+	}
+
 	bool isFull() {
 		int ret = file.readFileLines(buffer, MAX_ITEM_SIZE);
 		return (ret == MAX_ITEM_SIZE);
