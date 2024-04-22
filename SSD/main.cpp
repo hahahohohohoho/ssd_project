@@ -1,11 +1,10 @@
 #include "Application.cpp"
-#include "CmdString.h"
 
 void makeCmdList(Application& app) {
-	app.addCommand(new ReadCommand("Read", CMD[READ], 3));
-	app.addCommand(new WriteCommand("Write", CMD[WRITE], 4));
-	app.addCommand(new EraseCommand("Erase", CMD[ERASE], 4));
-	app.addCommand(new FlushCommand("Flush", CMD[FLUSH], 2));
+	app.addCommand(new ReadCommand());
+	app.addCommand(new WriteCommand());
+	app.addCommand(new EraseCommand());
+	app.addCommand(new FlushCommand());
 }
 
 int main(int argc, char* argv[]) {

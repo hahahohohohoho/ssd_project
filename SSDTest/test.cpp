@@ -354,8 +354,8 @@ TEST(TestSSD, AppInvalidArgument) {
 TEST(TestSSD, AppLessArgument) {
 	MockSSD ssd;
 	Application app(&ssd);
-	app.addCommand(new ReadCommand("Read", "R", 3));
-	app.addCommand(new WriteCommand("Write", "W", 4));
+	app.addCommand(new ReadCommand());
+	app.addCommand(new WriteCommand());
 
 	EXPECT_CALL(ssd, read(_))
 		.Times(0);
@@ -369,8 +369,8 @@ TEST(TestSSD, AppLessArgument) {
 TEST(TestSSD, AppArgumentPassing) {
 	MockSSD ssd;
 	Application app(&ssd);
-	app.addCommand(new ReadCommand("Read", "R", 3));
-	app.addCommand(new WriteCommand("Write", "W", 4));
+	app.addCommand(new ReadCommand());
+	app.addCommand(new WriteCommand());
 
 	EXPECT_CALL(ssd, read(0))
 		.Times(1);
@@ -395,8 +395,8 @@ ACTION(ThrowInvalidArgumentException) {
 TEST(TestSSD, AppExceptionHandle) {
 	MockSSD ssd;
 	Application app(&ssd);
-	app.addCommand(new ReadCommand("Read", "R", 3));
-	app.addCommand(new WriteCommand("Write", "W", 4));
+	app.addCommand(new ReadCommand());
+	app.addCommand(new WriteCommand());
 
 	EXPECT_CALL(ssd, read(-1))
 		.Times(1)
