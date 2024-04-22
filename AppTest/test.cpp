@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
 #include "../TestShell/SsdDriver.cpp"
+#include "../TestShell/Logger.cpp"
 
 #include <fstream>
 
