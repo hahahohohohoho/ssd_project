@@ -44,17 +44,6 @@ private:
 		return (size < 0 || size > SSD_MAX_ERASE_SIZE);
 	}
 
-	vector<std::string> splitString(const std::string& input, char delim) {
-		vector<std::string> tokens;
-		istringstream iss(input);
-		string token;
-
-		while (getline(iss, token, delim)) {
-			tokens.push_back(token);
-		}
-
-		return tokens;
-	}
 public:
 	SSD() {
 		for (int i = 0; i < SSD_MAX_DATA_SIZE; ++i) {
