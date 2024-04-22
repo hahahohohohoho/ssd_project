@@ -32,6 +32,34 @@ private:
 		return tokens;
 	}
 
+	bool isIncluded(int srcStart, int srcSize, int dstStart, int dstSize) {
+		int srcEnd = srcStart + srcSize - 1;
+		int dstEnd = dstStart + dstSize - 1;
+		if (dstStart <= srcStart && srcEnd <= dstEnd) {
+			return true;
+		}
+		return false;
+	}
+
+	bool isRemovable(CommandQueueItem newItem, CommandQueueItem item) {
+		if (newItem.cmdName == CMD[ERASE]) {
+			if (item.cmdName == CMD[WRITE] && isIncluded(stoi(item.parameter1), 1,
+				stoi(newItem.parameter1), stoi(newItem.parameter2))) {
+				return true;
+			}
+			if (item.cmdName == CMD[ERASE] && isIncluded(stoi(item.parameter1), stoi(item.parameter2),
+				stoi(newItem.parameter1), stoi(newItem.parameter2))) {
+				return true;
+			}
+		}
+		else if (newItem.cmdName == CMD[WRITE]) {
+			if (item.cmdName == CMD[WRITE] && stoi(item.parameter1) == stoi(newItem.parameter1)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 public:
 	CommandQueue() {
 
@@ -39,46 +67,15 @@ public:
 
 	void addItem(CommandQueueItem item) {
 		vector<CommandQueueItem> items = getItems();
-		reverse(items.begin(), items.end());
 
-		if (item.cmdName == CMD[ERASE]) {
-			int itemFirstLba = stoi(item.parameter1);
-			int itemLastLba = itemFirstLba + stoi(item.parameter2) - 1;
-			for (auto iter = items.begin(); iter != items.end();) {
-				if (iter->cmdName == CMD[WRITE]) {
-					int writeLba = stoi(iter->parameter1);
-					if (writeLba >= itemFirstLba && writeLba <= itemLastLba) {
-						iter = items.erase(iter);
-						continue;
-					}
-				}
-				else if (iter->cmdName == CMD[ERASE]) {
-					int eraseFirstLba = stoi(iter->parameter1);
-					int eraseLastLba = eraseFirstLba + stoi(iter->parameter2) - 1;
-					if (eraseFirstLba >= itemFirstLba && eraseLastLba <= itemLastLba) {
-						iter = items.erase(iter);
-						continue;
-					}
-				}
-				iter++;
+		for (auto iter = items.rbegin(); iter != items.rend();) {
+			if (isRemovable(item, *iter)) {
+				iter = decltype(iter)(items.erase(next(iter).base()));
+				continue;
 			}
-		}
-		else if (item.cmdName == CMD[WRITE]) {
-			int itemLba = stoi(item.parameter1);
-
-			for (auto iter = items.begin(); iter != items.end();) {
-				if (iter->cmdName == CMD[WRITE]) {
-					int writeLba = stoi(iter->parameter1);
-					if (writeLba == itemLba) {
-						iter = items.erase(iter);
-						continue;
-					}
-				}
-				iter++;
-			}
+			iter++;
 		}
 
-		reverse(items.begin(), items.end());
 		items.push_back(item);
 		setItems(items);
 	}
@@ -92,7 +89,7 @@ public:
 			}
 
 			if (iter->cmdName == CMD[ERASE] 
-				&& lba >= stoi(iter->parameter1) && lba < stoi(iter->parameter1) + stoi(iter->parameter2)) {
+				&& isIncluded(lba, 1, stoi(iter->parameter1), stoi(iter->parameter2))) {
 				return "0x00000000";
 			}
 		}
