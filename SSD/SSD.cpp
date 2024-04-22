@@ -30,7 +30,6 @@ private:
 	CommandQueue cq;
 	DataArrayFile nandFile{ "nand.txt" };
 	DataArrayFile resultFile{ "result.txt" };
-	DataArrayFile bufferFile{ "buffer.txt" };
 
 	bool isInvalidData(string data) {
 		return (data.length() != SSD_FIXED_DATA_LENGTH || data.substr(0, 2) != "0x");
