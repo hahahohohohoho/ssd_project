@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include "DataArrayFile.cpp"
+#include "CmdString.h"
 
 using namespace std;
 
@@ -40,18 +41,18 @@ public:
 		vector<CommandQueueItem> items = getItems();
 		reverse(items.begin(), items.end());
 
-		if (item.cmdName == "E") {
+		if (item.cmdName == CMD[ERASE]) {
 			int itemFirstLba = stoi(item.parameter1);
 			int itemLastLba = itemFirstLba + stoi(item.parameter2) - 1;
 			for (auto iter = items.begin(); iter != items.end();) {
-				if (iter->cmdName == "W") {
+				if (iter->cmdName == CMD[WRITE]) {
 					int writeLba = stoi(iter->parameter1);
 					if (writeLba >= itemFirstLba && writeLba <= itemLastLba) {
 						iter = items.erase(iter);
 						continue;
 					}
 				}
-				else if (iter->cmdName == "E") {
+				else if (iter->cmdName == CMD[ERASE]) {
 					int eraseFirstLba = stoi(iter->parameter1);
 					int eraseLastLba = eraseFirstLba + stoi(iter->parameter2) - 1;
 					if (eraseFirstLba >= itemFirstLba && eraseLastLba <= itemLastLba) {
@@ -62,11 +63,11 @@ public:
 				iter++;
 			}
 		}
-		else if (item.cmdName == "W") {
+		else if (item.cmdName == CMD[WRITE]) {
 			int itemLba = stoi(item.parameter1);
 
 			for (auto iter = items.begin(); iter != items.end();) {
-				if (iter->cmdName == "W") {
+				if (iter->cmdName == CMD[WRITE]) {
 					int writeLba = stoi(iter->parameter1);
 					if (writeLba == itemLba) {
 						iter = items.erase(iter);
@@ -87,10 +88,10 @@ public:
 		reverse(items.begin(), items.end());
 
 		for (auto iter = items.begin(); iter != items.end(); iter++) {
-			if (iter->cmdName == "W" && stoi(iter->parameter1) == lba) {
+			if (iter->cmdName == CMD[WRITE] && stoi(iter->parameter1) == lba) {
 				return iter->parameter2;
 			}
-			else if (iter->cmdName == "E" && lba >= stoi(iter->parameter1)) {
+			else if (iter->cmdName == CMD[ERASE] && lba >= stoi(iter->parameter1)) {
 				return "0x00000000";
 			}
 		}
