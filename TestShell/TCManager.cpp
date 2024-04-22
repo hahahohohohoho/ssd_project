@@ -89,14 +89,12 @@ public:
 
     void printTestCases() {
         cout << "\n[ TestCases ]" << endl;
-        log->print("[ TestCases ]");
+        //log->print("[ TestCases ]");
         for (TestCase tc : testcases) {
             cout << "- " << tc.getCmd() << " : " << tc.getName() << endl;
-            log->print("- " + tc.getCmd() + " : " + tc.getName());
+            //log->print("- " + tc.getCmd() + " : " + tc.getName());
         }
     }
-
-
 
 private:
     vector<TestCase> testcases;

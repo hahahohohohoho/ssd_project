@@ -22,18 +22,21 @@ public:
 	void SetUp() override {
 		shell = new TestShell(&mock_ssd);
 
-		cinBackup = std::cin.rdbuf();  // 원래 cin 버퍼 백업
-		std::cin.rdbuf(cinMock.rdbuf()); // cin을 cinMock으로 리다이렉션
+		cinBackup = std::cin.rdbuf();
+		std::cin.rdbuf(cinMock.rdbuf());
 	}
+
 	void TearDown() override {
 		delete shell;
 
-		std::cin.rdbuf(cinBackup); // 원래 cin 버퍼로 복원
+		std::cin.rdbuf(cinBackup);
 	}
+
 	void setMockInput(const std::string& input) {
 		cinMock.str(input);
 		cinMock.clear();
 	}
+
 	int getValidCount(string output, string value) {
 		int count = 0;
 		size_t pos = output.find(value);
@@ -47,31 +50,30 @@ public:
 	MockSSD mock_ssd;
 	TestShell* shell;
 
-	std::streambuf* cinBackup;  // cin의 원래 버퍼를 백업
-	std::istringstream cinMock; // 모의 입력 스트림
+	std::streambuf* cinBackup;
+	std::istringstream cinMock;
 };
 
 TEST_F(TestShellTestFixture, TestWrite) {
-
-	EXPECT_CALL(mock_ssd, write(0, "0xDEADCODE"))
-		.Times(1);
-
-	//shell->write(0, "0xDEADCODE");
 	setMockInput("write 0 0xDEADCODE");
+	
+	EXPECT_THROW(shell->processCommand(), InvalidInputException);
 }
 
 TEST_F(TestShellTestFixture, TestRead) {
-
+	string testvalue = "0x01234567";
 	EXPECT_CALL(mock_ssd, read(0))
 		.Times(1)
 		.WillOnce(Return(string("0x01234567")));
 
 	testing::internal::CaptureStdout();
-	//shell->read(0);
+
 	setMockInput("read 0");
+	shell->processCommand();
+
 	string output = testing::internal::GetCapturedStdout();
 
-	EXPECT_EQ(output, "0x01234567\n");
+	EXPECT_EQ(getValidCount(output, testvalue), 1);
 }
 
 TEST_F(TestShellTestFixture, TestFullRead) {
@@ -81,8 +83,9 @@ TEST_F(TestShellTestFixture, TestFullRead) {
 		.WillRepeatedly(Return(testvalue));
 
 	testing::internal::CaptureStdout();
-	//shell->fullread();
+
 	setMockInput("fullread");
+	shell->processCommand();
 	string output = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(getValidCount(output, testvalue), 100);
@@ -93,15 +96,13 @@ TEST_F(TestShellTestFixture, TestFullWrite) {
 	EXPECT_CALL(mock_ssd, write(AllOf(Ge(0), Le(99)), testvalue))
 		.Times(100);
 
-	//shell->fullwrite(testvalue);
 	setMockInput("fullwrite 0x01234567");
+	shell->processCommand();
 }
 
 TEST_F(TestShellTestFixture, TestExit) {
-
-	//EXPECT_THROW(shell->terminateProcess(), ExitException);
 	setMockInput("exit");
-	//EXPECT_THROW(shell->terminateProcess(), ExitException);
+	EXPECT_THROW(shell->processCommand(), ExitException);
 }
 
 TEST_F(TestShellTestFixture, TestHelp) {
@@ -109,15 +110,15 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	std::stringstream buffer;
 	std::streambuf* prevcoutbuf = std::cout.rdbuf(buffer.rdbuf());
 
-	//shell->help();
 	setMockInput("help");
+	shell->processCommand();
 
 	std::cout.rdbuf(prevcoutbuf);  // std::cout의 원래 버퍼로 복구
 
 	std::locale::global(std::locale("en_US.UTF-8"));
 	std::cout.imbue(std::locale());
 
-	string str = "[ CMD ]\n";
+	string str = "\nCMD > [ CMD ]\n";
 	str.append("- write {no} {data} : {data} was recorded in LBA {no}\n");
 	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
@@ -138,25 +139,25 @@ TEST_F(TestShellTestFixture, TestHelp) {
 TEST_F(TestShellTestFixture, TestGetLba) {
 	setMockInput("read 123456");
 
-	EXPECT_THROW(shell->start(), InvalidInputException);
+	EXPECT_THROW(shell->processCommand(), InvalidInputException);
 }
 
 TEST_F(TestShellTestFixture, TestGetLbaNormal) {
 	setMockInput("read 98");
 
-	EXPECT_NO_THROW(shell->start(), 98);
+	EXPECT_NO_THROW(shell->processCommand(), 98);
 }
 
 TEST_F(TestShellTestFixture, TestGetValue) {
 	setMockInput("write 1 zxvasd");
 
-	EXPECT_THROW(shell->start(), InvalidInputException);
+	EXPECT_THROW(shell->processCommand(), InvalidInputException);
 }
 
 TEST_F(TestShellTestFixture, TestGetValueNormal) {
 	setMockInput("write 1 0xABCDABCD");
 
-	EXPECT_NO_THROW(shell->start(), "0xABCDABCD");
+	EXPECT_NO_THROW(shell->processCommand(), "0xABCDABCD");
 }
 
 class SsdDriverTestFixture : public testing::Test {
@@ -168,10 +169,19 @@ public:
 		shell = new TestShell(ssdDriver);
 		testing::internal::CaptureStdout();
 
+		cinBackup = std::cin.rdbuf();
+		std::cin.rdbuf(cinMock.rdbuf());
 	}
+
 	void TearDown() override {
 		delete ssdDriver;
 		delete shell;
+		std::cin.rdbuf(cinBackup);
+	}
+
+	void setMockInput(const std::string& input) {
+		cinMock.str(input);
+		cinMock.clear();
 	}
 
 	void createDummy(string filename) {
@@ -186,20 +196,24 @@ public:
 
 	SSD_Driver* ssdDriver;
 	TestShell* shell;
+	streambuf* cinBackup;
+	istringstream cinMock;
 };
 
 TEST_F(SsdDriverTestFixture, DummySsdRead) {
-	//shell->read(0x1);
+	setMockInput("read 1");
+	shell->processCommand();
 
 	string output = testing::internal::GetCapturedStdout();
-	EXPECT_EQ(output, "0x12345678\n");
+	EXPECT_EQ(output, "\nCMD > 0x12345678\n");
 }
 
 TEST_F(SsdDriverTestFixture, DummySsdWrite) {
-	//shell->write(0x1, "0x87654321");
+	setMockInput("write 1 0x87654321");
+	shell->processCommand();
 
 	string output = testing::internal::GetCapturedStdout();
-	EXPECT_EQ(output, "SSD.exe W 1 0x87654321\n");
+	EXPECT_EQ(output, "\nCMD > SSD.exe W 1 0x87654321\n");
 
 	// EXPECT_THROW 를 사용하여 exitProgram이 호출될 때 예외가 발생하는지 확인
 	//EXPECT_THROW(shell.terminateProcess(), std::runtime_error);

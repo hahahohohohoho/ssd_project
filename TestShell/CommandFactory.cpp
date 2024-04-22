@@ -5,7 +5,8 @@
 
 class CommandFactory {
 public:
-    CommandFactory(ISSD* _ssd, TCManager* _tcManager) : ssd(_ssd), tcManager(_tcManager){ }
+    CommandFactory(ISSD* _ssd, TCManager* _tcManager) : ssd(_ssd), tcManager(_tcManager){
+    }
 
     std::unique_ptr<ShellCommand> createCommand(const std::string& command) {
         
@@ -43,9 +44,12 @@ public:
         else if (command == "exit") {
             retCommand = std::make_unique<ExitCommand>();
         }
+        else if (command == "testapp1" || command == "testapp2") {
+            retCommand = make_unique<TestCommand>();
+            retCommand->setCmdString(command);
+        }
         else {
-            if (tcManager->run(command) < 0)
-                retCommand = nullptr;
+            retCommand = nullptr;
         }
 
         if (retCommand) {

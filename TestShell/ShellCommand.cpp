@@ -18,9 +18,14 @@ public:
         tcManager = _tcManager;
     }
 
+    void setCmdString(string _cmd) {
+        cmd = _cmd;
+    }
+
 protected:
     ISSD* ssd;
     TCManager* tcManager;
+    string cmd;
 
     string read(int lba) {
         string value = ssd->read(lba);
@@ -54,9 +59,7 @@ public:
     WriteCommand(int lba, string value) : lba(lba), value(value) {}
 
     virtual void execute() {
-        for (int lba = 0; lba < 100; lba++) {
-            write(lba, value);
-        }
+        write(lba, value);
     }
 };
 
@@ -138,5 +141,12 @@ public:
             << "- exit : shell exits\n"
             << "- help : Displays how to use each command\n";
         tcManager->printTestCases();
+    }
+};
+
+class TestCommand : public ShellCommand {
+public:
+    virtual void execute() {
+        tcManager->run(cmd);
     }
 };

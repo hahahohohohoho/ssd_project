@@ -16,15 +16,16 @@ class TestShell {
 public:
 
 	explicit TestShell(ISSD* ssd) {
-		TCManager tcManager{ "tclist", TCManager::STDOUT_REDIRECTION_OFF };
-		commander = new CommandProcessor(new CommandFactory(ssd, &tcManager));
+		commander = new CommandProcessor(
+			new CommandFactory(
+				ssd, new TCManager("tclist", TCManager::STDOUT_REDIRECTION_OFF)));
 		log = LoggerSingleton::GetInstancePtr();
 	}
 
 	void start() {
 		while (1) {
 			try {
-				commander->processCommand(getCommand());
+				processCommand();
 			}
 			catch (InvalidInputException e) {
 				cout << e.what() << endl;
@@ -43,6 +44,10 @@ public:
 		}
 	}
 
+	void processCommand() {
+		commander->processCommand(getCommand());
+	}
+
 	string getCommand() {
 		string command;
 		cout << "\nCMD > ";
@@ -53,5 +58,6 @@ public:
 
 private:
 	CommandProcessor* commander;
+	CommandFactory* command_factory;
 	LoggerSingleton* log;
 };
