@@ -6,6 +6,7 @@
 #include "ISSD.h"
 #include "CustomException.cpp"
 #include "TCManager.cpp"
+#include "Logger.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ class TestShell {
 public:
 	explicit TestShell(ISSD* _ssd) : ssd(_ssd) {
 		tcManager = new TCManager("tclist", TCManager::STDOUT_REDIRECTION_OFF);
+		log = LoggerSingleton::GetInstancePtr();
 	}
 
 	void start() {
@@ -22,11 +24,13 @@ public:
 			}
 			catch (InvalidInputException e) {
 				cout << e.what() << endl;
+				log->print(e.what());
 				while (std::cin.get() != '\n');
 				help();
 			}
 			catch (ExitException e) {
 				cout << e.what() << endl;
+				log->print(e.what());
 				break;
 			}
 		}
@@ -36,6 +40,7 @@ public:
 		string command;
 		cout << "\nCMD > ";
 		cin >> command;
+		log->print("CMD > " + command);
 		return command;
 	}
 	
@@ -73,8 +78,10 @@ public:
 			help();
 		}
 		else {
-			if (tcManager->run(command) < 0)
+			if (tcManager->run(command) < 0) {
+				log->print("Invalid Command");
 				throw InvalidInputException("Invalid Command");
+			}
 		}
 	}
 
@@ -141,6 +148,7 @@ public:
 
 	void erase(int lba, int size) {
 		ssd->erase(lba, size);
+		log->print("LBA : " + to_string(lba) + ", SIZE : " + value);
 	}
 
 	void erase_range(int start_lba, int end_lba) {
@@ -155,12 +163,13 @@ public:
 
 	void write(int lba, string value) {
 		ssd->write(lba, value);
+		log->print("LBA : " + to_string(lba) + ", VALUE : " + value);
 	}
 
 	string read(int lba) {
 		string value = ssd->read(lba);
 		cout << value << endl;
-
+		log->print("LBA : " + to_string(lba) + ", VALUE : " + value);
 		return value;
 	}
 
@@ -190,6 +199,18 @@ public:
 			<< "- exit : shell exits\n"
 			<< "- help : Displays how to use each command\n";
 		tcManager->printTestCases();
+
+		log->print("[ CMD ]");
+		log->print("- write {no} {data} : {data} was recorded in LBA {no}");
+		log->print("-- {data} : hexadecimal ");
+		log->print("-- ex. write 3 0xAAAABBBB");
+		log->print("- read {no} : Read LBA {no} times");
+		log->print("- fullwrite {value} : 0~99 LBA Write");
+		log->print("- fullread : 0~99 LBA Read");
+		log->print("- erase {lba} {size}");
+		log->print("- erase_range {start lba} {end lba}");
+		log->print("- exit : shell exits");
+		log->print("- help : Displays how to use each command");
 	}
 
 private:
@@ -198,4 +219,6 @@ private:
 	int start_lba, end_lba;
 	int size;
 	string value;
+
+	LoggerSingleton* log;
 };
