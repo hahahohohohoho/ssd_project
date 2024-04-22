@@ -37,10 +37,46 @@ public:
 	}
 
 	void addItem(CommandQueueItem item) {
-		int size = file.readFileLines(buffer, MAX_ITEM_SIZE);
-		buffer[size++] =
-			item.cmdName + " " + item.parameter1 + " " + item.parameter2;
-		file.writeFileLines(buffer, size);
+		vector<CommandQueueItem> items = getItems();
+		reverse(items.begin(), items.end());
+
+		if (item.cmdName == "E") {
+			int itemFirstLba = stoi(item.parameter1);
+			int itemLastLba = itemFirstLba + stoi(item.parameter2) - 1;
+			for (auto iter = items.begin(); iter < items.end();) {
+				if (iter->cmdName == "W") {
+					int writeLba = stoi(iter->parameter1);
+					if (writeLba >= itemFirstLba && writeLba <= itemLastLba) {
+						iter = items.erase(iter);
+					}
+				}
+				else if (iter->cmdName == "E") {
+					int eraseFirstLba = stoi(iter->parameter1);
+					int eraseLastLba = eraseFirstLba + stoi(iter->parameter2) - 1;
+					if (eraseFirstLba >= itemFirstLba && eraseLastLba <= itemLastLba) {
+						iter = items.erase(iter);
+					}
+				}
+				iter++;
+			}
+		}
+		else if (item.cmdName == "W") {
+			int itemLba = stoi(item.parameter1);
+
+			for (auto iter = items.begin(); iter < items.end();) {
+				if (iter->cmdName == "W") {
+					int writeLba = stoi(iter->parameter1);
+					if (writeLba == itemLba) {
+						iter = items.erase(iter);
+					}
+				}
+				iter++;
+			}
+		}
+
+		reverse(items.begin(), items.end());
+		items.push_back(item);
+		setItems(items);
 	}
 
 	bool isFull() {
@@ -63,14 +99,11 @@ public:
 		return ret;
 	}
 
-	void removeItem(int index) {
-		string newBuffer[MAX_ITEM_SIZE];
-		int size = file.readFileLines(buffer, MAX_ITEM_SIZE);
-		for (int i = 0; i < size; i++) {
-			if (i == index)
-				continue;
-			newBuffer[i] = buffer[i];
+	void setItems(vector<CommandQueueItem> items) {
+		for (auto iter = items.begin(); iter < items.end(); iter++) {
+			buffer[distance(items.begin(), iter)] = 
+				iter->cmdName + " " + iter->parameter1 + " " + iter->parameter2;
 		}
-		file.writeFileLines(newBuffer, size);
+		file.writeFileLines(buffer, items.size());
 	}
 };
