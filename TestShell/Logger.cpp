@@ -9,33 +9,44 @@ using namespace std;
 const static string baseFolder = ".\\log\\";
 const static string latestFilePath = baseFolder + "latest.log";
 
-
 #define MOVE_LOG_FILE(FROM, TO) ( string("move ") + (FROM) + string(" ") + (TO) )
 
-
-class Logger {
+class LoggerSingleton {
 public:
-	Logger() {
-		system((string("mkdir ") + baseFolder).c_str());
-		currentLogSize = 0;
-	}
-	~Logger() {
-		logFile.close();
-	}
+	static LoggerSingleton& GetIstance() {
+		if (instance == nullptr) {
+			instance = new LoggerSingleton();
+		}
 
+		return *instance;
+	}
 
 	string print(string log, string func = __builtin_FUNCTION()) {
 		openFile();
 
 		string logFormat = collectLog(log, func);
-		
+
 		separateLogFiles();
 		compressLogFiles();
 
 		return logFormat;
 	}
-
 private:
+
+	ofstream logFile;
+	size_t currentLogSize;
+	queue<string> logFileList;
+
+	static LoggerSingleton* instance;
+
+	LoggerSingleton() {
+		system((string("mkdir ") + baseFolder).c_str());
+		currentLogSize = 0;
+	}
+	~LoggerSingleton() {
+		logFile.close();
+	}
+
 	void openFile(void) {
 		if (!logFile.is_open()) {
 			logFile.open(latestFilePath.c_str());
@@ -85,16 +96,13 @@ private:
 		while (func.size() < 30) {
 			func.append(" ");
 		}
-		
-		string logFormat = string(timestamp) + " " + func + ": " + log + "\n";
+
+		string logFormat = string(timestamp) + " " + func.substr(0, 30) + ": " + log + "\n";
 		logFile << logFormat;
 		currentLogSize += logFormat.size();
 
 		return logFormat;
 	}
-
-	ofstream logFile;
-	size_t currentLogSize;
-	queue<string> logFileList;
-
 };
+LoggerSingleton* LoggerSingleton::instance = nullptr;
+
