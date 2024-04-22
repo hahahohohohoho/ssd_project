@@ -133,6 +133,7 @@
     <ClCompile Include="CustomException.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Runner.cpp" />
     <ClCompile Include="SsdDriver.cpp" />
     <ClCompile Include="TCManager.cpp" />
     <ClCompile Include="TestShell.cpp" />
