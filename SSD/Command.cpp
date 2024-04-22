@@ -30,8 +30,8 @@ public:
 
 class ReadCommand : public Command {
 public:
-	ReadCommand(string title, string commandName, int requiredArgCnt)
-		: Command(title, commandName, requiredArgCnt) {
+	ReadCommand()
+		: Command("Read", CMD[READ], 3) {
 
 	}
 
@@ -42,8 +42,8 @@ public:
 
 class WriteCommand : public Command {
 public:
-	WriteCommand(string title, string commandName, int requiredArgCnt)
-		: Command(title, commandName, requiredArgCnt) {
+	WriteCommand()
+		: Command("Write", CMD[WRITE], 4) {
 
 	}
 
@@ -54,8 +54,8 @@ public:
 
 class EraseCommand : public Command {
 public:
-	EraseCommand(string title, string commandName, int requiredArgCnt)
-		: Command(title, commandName, requiredArgCnt) {
+	EraseCommand()
+		: Command("Erase", CMD[ERASE], 4) {
 
 	}
 
@@ -66,8 +66,8 @@ public:
 
 class FlushCommand : public Command {
 public:
-	FlushCommand(string title, string commandName, int requiredArgCnt)
-		: Command(title, commandName, requiredArgCnt) {
+	FlushCommand()
+		: Command("Flush", CMD[FLUSH], 2) {
 
 	}
 
