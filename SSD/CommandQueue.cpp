@@ -91,7 +91,8 @@ public:
 			if (iter->cmdName == CMD[WRITE] && stoi(iter->parameter1) == lba) {
 				return iter->parameter2;
 			}
-			else if (iter->cmdName == CMD[ERASE] && lba >= stoi(iter->parameter1)) {
+			else if (iter->cmdName == CMD[ERASE] 
+				&& lba >= stoi(iter->parameter1) && lba < stoi(iter->parameter1) + stoi(iter->parameter2)) {
 				return "0x00000000";
 			}
 		}
