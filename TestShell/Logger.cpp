@@ -7,8 +7,10 @@
 #include "Logger.h"
 using namespace std;
 
-#define MOVE_LOG_FILE(FROM, TO) ( string("move ") + (FROM) + string(" ") + (TO) )
+#define FILE_SEPERATION_THRESHOLD_SIZE_BYTE	(10000)
+#define FILE_COMPRESS_THRESHOLD_COUNT		(2)
 
+#define MOVE_LOG_FILE(FROM, TO) ( string("move ") + (FROM) + string(" ") + (TO) )
 
 LoggerSingleton* LoggerSingleton::instance = nullptr;
 
@@ -38,7 +40,7 @@ void LoggerSingleton::openFile(void) {
 	if (!logFile.is_open()) {
 		logFile.open(latestFilePath.c_str());
 		if (!logFile.is_open()) {
-			cout << "FILE OPEN FAIL" << endl;
+			cout << "[LOGGER] LOG FILE OPEN FAIL" << endl;
 			exit(1);
 		}
 		currentLogSize = 0;
@@ -46,16 +48,16 @@ void LoggerSingleton::openFile(void) {
 }
 
 void LoggerSingleton::separateLogFiles(void) {
-	if (currentLogSize > 10000) {
+	if (currentLogSize > FILE_SEPERATION_THRESHOLD_SIZE_BYTE) {
 		logFile.close();
 		currentLogSize = 0;
 
-		time_t now = time(0);
-		tm* timeinfo = localtime(&now);
-
+		time_t now = time(NULL);
+		tm timeinfo;
+		localtime_s(&timeinfo, &now);
 		char fileName[size("until_yymmdd_HHh_MMm_SSs.log")];
 		strftime(fileName, sizeof(fileName),
-			"until_%y%m%d_%Hh_%Mm_%Ss.log", timeinfo);
+			"until_%y%m%d_%Hh_%Mm_%Ss.log", &timeinfo);
 
 		string cmd = MOVE_LOG_FILE(latestFilePath, baseFolder + string(fileName));
 		system(cmd.c_str());
@@ -64,7 +66,7 @@ void LoggerSingleton::separateLogFiles(void) {
 	}
 }
 void LoggerSingleton::compressLogFiles(void) {
-	while (logFileList.size() > 2) {
+	while (logFileList.size() > FILE_COMPRESS_THRESHOLD_COUNT) {
 		string logfileName = logFileList.front();
 		logFileList.pop();
 
@@ -73,11 +75,12 @@ void LoggerSingleton::compressLogFiles(void) {
 	}
 }
 string LoggerSingleton::collectLog(string log, string func) {
-	time_t now = time(0);
-	tm* timeinfo = localtime(&now);
+	time_t now = time(NULL);
+	tm timeinfo;
+	localtime_s(&timeinfo, &now);
 	char timestamp[size("[yy.mm.dd hh:mm]")];
 	strftime(timestamp, sizeof(timestamp),
-		"[%y.%m.%d %H:%M]", timeinfo);
+		"[%y.%m.%d %H:%M]", &timeinfo);
 
 	func.append("()");
 	while (func.size() < 30) {

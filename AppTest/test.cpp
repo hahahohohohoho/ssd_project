@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include "../TestShell/TestShell.cpp"
 #include "../TestShell/SsdDriver.cpp"
+#include "../TestShell/Logger.cpp"
 
 #include <fstream>
 
@@ -116,17 +117,20 @@ TEST_F(TestShellTestFixture, TestHelp) {
 	std::locale::global(std::locale("en_US.UTF-8"));
 	std::cout.imbue(std::locale());
 
-	string str = "- write {no} {data} : {data} was recorded in LBA {no}\n";
+	string str = "[ CMD ]\n";
+	str.append("- write {no} {data} : {data} was recorded in LBA {no}\n");
 	str.append("-- {data} : hexadecimal \n");
 	str.append("-- ex. write 3 0xAAAABBBB\n");
 	str.append("- read {no} : Read LBA {no} times\n");
-
 	str.append("- fullwrite {value} : 0~99 LBA Write\n");
 	str.append("- fullread : 0~99 LBA Read\n");
-	str.append("- testapp1 : fullread/write test\n");
-	str.append("- testapp2 : Write Aging Test\n");
+	str.append("- erase {lba} {size}\n");
+	str.append("- erase_range {start lba} {end lba}\n");
 	str.append("- exit : shell exits\n");
 	str.append("- help : Displays how to use each command\n");
+	str.append("\n[ TestCases ]");
+	str.append("\n- testapp1 : TestScenario_FullWrite");
+	str.append("\n- testapp2 : TestScenario_WriteAging\n");
 
 	ASSERT_EQ(str, buffer.str());  // buffer에 저장된 문자열 검증
 }

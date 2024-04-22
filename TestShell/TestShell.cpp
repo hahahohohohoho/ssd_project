@@ -8,14 +8,17 @@
 #include "CustomException.cpp"
 #include "TCManager.cpp"
 #include "CommandFactory.cpp"
+#include "Logger.h"
 
 using namespace std;
 
 class TestShell {
 public:
-	explicit TestShell(ISSD* ssd) { 
+
+	explicit TestShell(ISSD* ssd) {
 		TCManager tcManager{ "tclist", TCManager::STDOUT_REDIRECTION_OFF };
 		commander = new CommandProcessor(new CommandFactory(ssd, &tcManager));
+		log = LoggerSingleton::GetInstancePtr();
 	}
 
 	void start() {
@@ -25,10 +28,12 @@ public:
 			}
 			catch (InvalidInputException e) {
 				cout << e.what() << endl;
+				log->print(e.what());
 				while (std::cin.get() != '\n');
 			}
 			catch (ExitException e) {
 				cout << e.what() << endl;
+				log->print(e.what());
 				break;
 			}
 			catch (exception e) {
@@ -42,9 +47,11 @@ public:
 		string command;
 		cout << "\nCMD > ";
 		cin >> command;
+		log->print("CMD > " + command);
 		return command;
 	}
 
 private:
 	CommandProcessor* commander;
+	LoggerSingleton* log;
 };

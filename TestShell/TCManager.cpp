@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include "TCResult.h"
+#include "Logger.h"
 using namespace std;
 
 class TestCase {
@@ -49,6 +50,7 @@ public:
         }
         else {
             std::cerr << "Error: Unable to open file for writing." << std::endl;
+            log->print("Error: Unable to open file for writing.");
         }
 
         ifstream infile(filename);
@@ -63,6 +65,7 @@ public:
         }
         else {
             cerr << "[TCManager][ERROR] file open failed." << endl;
+            log->print("[TCManager][ERROR] file open failed.");
         }
 
         return lines;
@@ -77,6 +80,7 @@ public:
                 else
                      cmd += ".exe";
 
+                log->print(cmd);
                 return system(cmd.c_str());
             }
         }
@@ -85,8 +89,10 @@ public:
 
     void printTestCases() {
         cout << "\n[ TestCases ]" << endl;
+        log->print("[ TestCases ]");
         for (TestCase tc : testcases) {
             cout << "- " << tc.getCmd() << " : " << tc.getName() << endl;
+            log->print("- " + tc.getCmd() + " : " + tc.getName());
         }
     }
 
@@ -95,4 +101,6 @@ public:
 private:
     vector<TestCase> testcases;
     int redirection = STDOUT_REDIRECTION_ON;
+
+    LoggerSingleton* log = LoggerSingleton::GetInstancePtr();
 };

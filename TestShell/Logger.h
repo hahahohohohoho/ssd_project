@@ -8,12 +8,19 @@ using namespace std;
 
 class LoggerSingleton {
 public:
-	static LoggerSingleton& GetInstance() {
+	static LoggerSingleton& GetInstanceRef() {
 		if (instance == nullptr) {
 			instance = new LoggerSingleton();
 		}
 
 		return *instance;
+	}
+	static LoggerSingleton* GetInstancePtr() {
+		if (instance == nullptr) {
+			instance = new LoggerSingleton();
+		}
+
+		return instance;
 	}
 
 	string print(string log, string func = __builtin_FUNCTION());
