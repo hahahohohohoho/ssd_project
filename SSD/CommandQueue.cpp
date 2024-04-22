@@ -43,11 +43,12 @@ public:
 		if (item.cmdName == "E") {
 			int itemFirstLba = stoi(item.parameter1);
 			int itemLastLba = itemFirstLba + stoi(item.parameter2) - 1;
-			for (auto iter = items.begin(); iter < items.end();) {
+			for (auto iter = items.begin(); iter != items.end();) {
 				if (iter->cmdName == "W") {
 					int writeLba = stoi(iter->parameter1);
 					if (writeLba >= itemFirstLba && writeLba <= itemLastLba) {
 						iter = items.erase(iter);
+						continue;
 					}
 				}
 				else if (iter->cmdName == "E") {
@@ -55,6 +56,7 @@ public:
 					int eraseLastLba = eraseFirstLba + stoi(iter->parameter2) - 1;
 					if (eraseFirstLba >= itemFirstLba && eraseLastLba <= itemLastLba) {
 						iter = items.erase(iter);
+						continue;
 					}
 				}
 				iter++;
@@ -63,11 +65,12 @@ public:
 		else if (item.cmdName == "W") {
 			int itemLba = stoi(item.parameter1);
 
-			for (auto iter = items.begin(); iter < items.end();) {
+			for (auto iter = items.begin(); iter != items.end();) {
 				if (iter->cmdName == "W") {
 					int writeLba = stoi(iter->parameter1);
 					if (writeLba == itemLba) {
 						iter = items.erase(iter);
+						continue;
 					}
 				}
 				iter++;
@@ -83,7 +86,7 @@ public:
 		vector<CommandQueueItem> items = getItems();
 		reverse(items.begin(), items.end());
 
-		for (auto iter = items.begin(); iter < items.end(); iter++) {
+		for (auto iter = items.begin(); iter != items.end(); iter++) {
 			if (iter->cmdName == "W" && stoi(iter->parameter1) == lba) {
 				return iter->parameter2;
 			}
@@ -116,7 +119,7 @@ public:
 	}
 
 	void setItems(vector<CommandQueueItem> items) {
-		for (auto iter = items.begin(); iter < items.end(); iter++) {
+		for (auto iter = items.begin(); iter != items.end(); iter++) {
 			buffer[distance(items.begin(), iter)] = 
 				iter->cmdName + " " + iter->parameter1 + " " + iter->parameter2;
 		}

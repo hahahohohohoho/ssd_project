@@ -105,6 +105,10 @@ public:
 	string readResult() {
 		return readFile(TEST_RESULT_FILE_PATH)[0];
 	}
+
+	vector<string> readBuffer() {
+		return readFile(TEST_BUFFER_FILE_PATH);
+	}
 };
 
 TEST_F(TestSSDFixture, WriteOneData) {
@@ -198,7 +202,7 @@ TEST_F(TestSSDFixture, ReadWithInvalidLBA) {
 	EXPECT_THROW(ssd.read(100), out_of_range);
 }
 
-TEST_F(TestSSDFixture, FastReadErase1) {
+TEST_F(TestSSDFixture, FastReadTestErase1) {
 	SSD ssd;
 	writeNand(2, "0x11223344");
 	writeBufferE(2, 5);
@@ -208,7 +212,7 @@ TEST_F(TestSSDFixture, FastReadErase1) {
 	EXPECT_THAT(readResult(), "0x00000000");
 }
 
-TEST_F(TestSSDFixture, FastReadErase2) {
+TEST_F(TestSSDFixture, FastReadTestErase2) {
 	SSD ssd;
 	writeNand(6, "0x11223344");
 	writeBufferE(2, 5);
@@ -218,7 +222,7 @@ TEST_F(TestSSDFixture, FastReadErase2) {
 	EXPECT_THAT(readResult(), "0x00000000");
 }
 
-TEST_F(TestSSDFixture, FastReadWrite1) {
+TEST_F(TestSSDFixture, FastReadTestWrite1) {
 	SSD ssd;
 	writeNand(5, "0x11223344");
 	writeBufferW(5, "0x00001122");
@@ -226,6 +230,68 @@ TEST_F(TestSSDFixture, FastReadWrite1) {
 	ssd.read(5);
 
 	EXPECT_THAT(readResult(), "0x00001122");
+}
+
+TEST_F(TestSSDFixture, FastWriteTestWrite1) {
+	SSD ssd;
+	writeBufferW(2, "0x00001122");
+	writeBufferW(5, "0x00001133");
+
+	ssd.write(5, "0x11223344");
+
+	vector<string> buffer = readBuffer();
+	EXPECT_THAT(buffer.size(), 2);
+	EXPECT_THAT(buffer[0], "W 2 0x00001122");
+	EXPECT_THAT(buffer[1], "W 5 0x11223344");
+}
+
+TEST_F(TestSSDFixture, FastWriteTestWrite2) {
+	SSD ssd;
+	writeBufferW(2, "0x00001122");
+	writeBufferW(5, "0x00001133");
+
+	ssd.write(2, "0x11223344");
+
+	vector<string> buffer = readBuffer();
+	EXPECT_THAT(buffer.size(), 2);
+	EXPECT_THAT(buffer[0], "W 5 0x00001133");
+	EXPECT_THAT(buffer[1], "W 2 0x11223344");
+}
+
+TEST_F(TestSSDFixture, FastWriteTestErase1) {
+	SSD ssd;
+	writeBufferE(5, 2);
+
+	ssd.erase(4, 3);
+
+	vector<string> buffer = readBuffer();
+	EXPECT_THAT(buffer.size(), 1);
+	EXPECT_THAT(buffer[0], "E 4 3");
+}
+
+TEST_F(TestSSDFixture, FastWriteTestErase2) {
+	SSD ssd;
+	writeBufferE(5, 2);
+	writeBufferW(10, "0x00001122");
+
+	ssd.erase(4, 3);
+
+	vector<string> buffer = readBuffer();
+	EXPECT_THAT(buffer.size(), 2);
+	EXPECT_THAT(buffer[0], "W 10 0x00001122");
+	EXPECT_THAT(buffer[1], "E 4 3");
+}
+
+TEST_F(TestSSDFixture, FastWriteTestErase3) {
+	SSD ssd;
+	writeBufferE(5, 2);
+	writeBufferW(6, "0x00001122");
+
+	ssd.erase(4, 3);
+
+	vector<string> buffer = readBuffer();
+	EXPECT_THAT(buffer.size(), 1);
+	EXPECT_THAT(buffer[0], "E 4 3");
 }
 
 TEST_F(TestSSDFixture, EraseOneData) {
