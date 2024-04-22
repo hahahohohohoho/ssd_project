@@ -85,13 +85,13 @@ public:
 
 	string findData(int lba) {
 		vector<CommandQueueItem> items = getItems();
-		reverse(items.begin(), items.end());
 
-		for (auto iter = items.begin(); iter != items.end(); iter++) {
+		for (auto iter = items.rbegin(); iter != items.rend(); iter++) {
 			if (iter->cmdName == CMD[WRITE] && stoi(iter->parameter1) == lba) {
 				return iter->parameter2;
 			}
-			else if (iter->cmdName == CMD[ERASE] && lba >= stoi(iter->parameter1)) {
+
+			if (iter->cmdName == CMD[ERASE] && lba >= stoi(iter->parameter1)) {
 				return "0x00000000";
 			}
 		}
