@@ -74,6 +74,7 @@ public:
     int run(string cmd) {
         for (TestCase tc : testcases) {
             if (cmd == tc.getCmd()) {
+                cout << tc.getName() << "   ---   Run...";
                 string cmd = tc.getName()+".exe";
                 if (redirection == TCManager::STDOUT_REDIRECTION_ON) {
                     cmd += " >> test_result.log";
