@@ -74,13 +74,11 @@ public:
     int run(string cmd) {
         for (TestCase tc : testcases) {
             if (cmd == tc.getCmd()) {
-                string cmd = tc.getName();
-                if (redirection == TCManager::STDOUT_REDIRECTION_ON)
-                     cmd += ".exe >> test_result.log";
-                else
-                     cmd += ".exe";
+                string cmd = tc.getName()+".exe";
+                if (redirection == TCManager::STDOUT_REDIRECTION_ON) {
+                    cmd += " >> test_result.log";
+                }
 
-                log->print(cmd);
                 return system(cmd.c_str());
             }
         }
