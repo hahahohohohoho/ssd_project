@@ -13,7 +13,6 @@ public:
 	void start(string fileName) {
 		std::ifstream file(fileName);
 
-		std::string line;
 		if (!file.is_open()) {
 			std::cerr << "파일을 열 수 없습니다." << std::endl;
 			return;
@@ -21,8 +20,8 @@ public:
 
 		TCManager* tcManager = new TCManager("tclist", TCManager::STDOUT_REDIRECTION_ON);
 
-		while (std::getline(file, line)) {  // 파일에서 한 줄씩 읽기
-			std::cout << line << "   ---   Run...";
+		std::string line;
+		while (std::getline(file, line)) {
 			if (tcManager->run(line) == TCResult::PASS) {
 				cout << "Pass\n";
 			}
@@ -31,6 +30,6 @@ public:
 				break;
 			}
 		}
-		file.close();  // 파일 닫기
+		file.close();
 	}
 };
